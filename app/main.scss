@@ -3,11 +3,13 @@
 //vars
 $primary-color: #f9f9fd;
 $nav-color: #FFFF33;
+$logo-color: #363689;
 
 body {
 	background: $primary-color;
 }
 
+//bootstrap override
 .navbar navbar-default {
 	border-width: 0;
 	border-radius: none;
@@ -20,6 +22,15 @@ body {
 .nav-logo {
 	width: 269px;
 	margin-top: -5px;
+}
+
+.navbar-default .navbar-brand {
+	color: $logo-color;
+}
+
+.navbar-brand {
+	font-family: 'Lobster Two', cursive;
+	font-size: 1.65em;
 }
 
 .center {

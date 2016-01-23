@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
 //import './Modal.jsx';
 //import {Table, Column, Cell} from 'fixed-data-table';
+import './startup.js';
 var FixedDataTable = require('fixed-data-table');
 const {Table, Column, Cell} = FixedDataTable;
 
@@ -91,13 +92,12 @@ const customStyles = {
   }
 };
  
- 
 var MModal = React.createClass({
- 
+
   getInitialState: function() {
     return { modalIsOpen: false };
   },
- 
+
   openModal: function() {
     this.setState({modalIsOpen: true});
   },
@@ -109,7 +109,29 @@ var MModal = React.createClass({
 
   saveRecipe: function(event) {
   	event.preventDefault();
-  	console.log('clicked save');
+  	// console.log('clicked save');
+  	var name = document.getElementById('recipeName').value;
+  	// console.log('name: ' + name);
+  	var ingredientsStr = document.getElementById('recipeIngredients').value;
+  	// console.log('ingredientsStr: ' + ingredientsStr);
+  	var ingredientsAr = ingredientsStr.split(',');
+//stores final array of ingredients strings, trimmed
+  	var ingredientsTrim = [];
+  	// console.log('ingredientsAr: ' + ingredientsAr);
+  	// console.log('length ingredientsAr: ' + ingredientsAr.length);
+  	ingredientsAr.forEach(function(item) {
+  		// console.log('item: ' + item);
+  		var itemCopy = item.slice(0).trim();
+  		ingredientsTrim.push(itemCopy);
+  	});
+  	console.log('ingredientsTrim: ' + ingredientsTrim);
+  	console.log('length 0: ' + ingredientsTrim[0].length);
+  	console.log('length 1: ' + ingredientsTrim[1].length);
+  },
+
+  setName: function(event) {
+  	//var name = event.target.recipeName.value;
+  	//this.setState({name: name});
   },
  
   render: function() {
@@ -127,11 +149,11 @@ var MModal = React.createClass({
           <form>
           	<div className="form-group">
     			<label htmlFor="recipe-name">Name</label>
-    			<input type="text" className="form-control" id="recipe-name" size="50" />
+    			<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" />
   			</div>
           	<div className="form-group">
     			<label htmlFor="recipe-ingredients">Ingredients</label>
-    			<input type="text" className="form-control" id="recipe-ingredients" placeholder="enter ingredients separated by commas" size="50" />
+    			<input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" placeholder="enter ingredients separated by commas" size="50" />
   			</div>
   			<button type="submit" onClick={this.saveRecipe} className="btn btn-primary">Add Recipe</button> <button className="btn btn-default" onClick={this.closeModal}>Close</button>
           </form>
