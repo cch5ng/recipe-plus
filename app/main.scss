@@ -1,0 +1,58 @@
+/* app/main.scss */
+
+//vars
+$primary-color: #ffe6e6;
+$nav-color: #006400;
+
+body {
+	background: $primary-color;
+}
+
+.navbar navbar-default {
+	border-width: 0;
+	border-radius: none;
+}
+
+.navbar {
+	background-color: $nav-color;
+}
+
+.nav-logo {
+	width: 269px;
+	margin-top: -5px;
+}
+
+.center {
+	text-align: center;
+}
+
+.avatar {
+	width: 28px;
+	border-radius: 3px;
+}
+
+.dynamic-header {
+	color: #21586b;
+	text-decoration: underline;
+}
+
+.fa-caret-down {
+	text-decoration: underline;
+}
+
+.fa-heart {
+	color: #990033;
+}
+
+.hide-fa {
+	display: none;
+}
+
+//override fixed-data-table css
+.fixedDataTableLayout_main {
+	margin: 0 auto;
+}
+
+.footer {
+	padding-top: 30px;
+}
