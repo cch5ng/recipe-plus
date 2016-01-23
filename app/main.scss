@@ -1,8 +1,8 @@
 /* app/main.scss */
 
 //vars
-$primary-color: #ffe6e6;
-$nav-color: #006400;
+$primary-color: #f9f9fd;
+$nav-color: #FFFF33;
 
 body {
 	background: $primary-color;
@@ -24,6 +24,10 @@ body {
 
 .center {
 	text-align: center;
+}
+
+input {
+	width: 200px;
 }
 
 .avatar {

@@ -2,6 +2,8 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Modal from 'react-modal';
+//import './Modal.jsx';
 //import {Table, Column, Cell} from 'fixed-data-table';
 var FixedDataTable = require('fixed-data-table');
 const {Table, Column, Cell} = FixedDataTable;
@@ -58,69 +60,12 @@ export default class App extends React.Component {
 				<div className="row">
 					<nav className="navbar navbar-default">
 						<div className="navbar-header">
-							<a className="navbar-brand" href="#">
-								<img src="https://s3.amazonaws.com/freecodecamp/freecodecamp_logo.svg" alt="learn to code javascript at Free Code Camp logo" className="img-responsive nav-logo" />
-							</a>
+							<a className="navbar-brand" href="#">Recipe Box</a>
 						</div>
 					</nav>
 				</div>
 
-				<div className="row">
-					<h2 className="center">Leaderboard</h2>
-				</div>
-
-				<Table data={this.state.data}
-					rowsCount={this.state.data.length}
-					rowHeight={40}
-					headerHeight={45}
-					width={680}
-					height={4050} className="center">
-
-					<Column
-						header={<Cell>#</Cell>}
-						cell={props => (
-							<Cell {...props}>
-								{props.rowIndex + 1}
-							</Cell>
-						)}
-						width={50}
-					/>
-					<Column
-						header={<Cell>Camper Name</Cell>}
-						cell={props => (
-							<Cell {...props}>
-								<img src={this.state.data[props.rowIndex].img} alt="camper avatar" className="avatar"/> {this.state.data[props.rowIndex].username}
-							</Cell>
-						)}
-						width={300}
-					/>
-					<Column
-						header={<Cell onClick={this.handleClickMonthPoints.bind(this)} 
-								className="dynamic-header" >
-									Points (last month) 
-									<i className={this.state.url === urlRecent ? "fa fa-caret-down" : "hide-fa"}></i>
-								</Cell>}
-						cell={props => (
-							<Cell {...props}>
-							  {this.state.data[props.rowIndex].recent}
-							</Cell>
-						)}
-						width={165}
-					/>
-					<Column
-						header={<Cell onClick={this.handleClickTotalPoints.bind(this)}
-								className="dynamic-header" >
-								Points (total) 
-								<i className={this.state.url === urlTotal ? "fa fa-caret-down" : "hide-fa"}></i>
-								</Cell>}
-						cell={props => (
-							<Cell {...props}>
-							  {this.state.data[props.rowIndex].alltime}
-							</Cell>
-						)}
-						width={165}
-					/>
-				</Table>
+				<MModal />
 
 				<div className="row footer">
 					<div className="col-xs-12 col-sm-12">
@@ -135,5 +80,63 @@ export default class App extends React.Component {
 	}
 }
 
-// App.propTypes = { initialContent: React.PropTypes.string };
-// App.defaultProps = { initialContent: '', initialMd: ''};
+const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+};
+ 
+ 
+var MModal = React.createClass({
+ 
+  getInitialState: function() {
+    return { modalIsOpen: false };
+  },
+ 
+  openModal: function() {
+    this.setState({modalIsOpen: true});
+  },
+ 
+  closeModal: function(event) {
+  	//event.preventDefault();
+    this.setState({modalIsOpen: false});
+  },
+
+  saveRecipe: function(event) {
+  	event.preventDefault();
+  	console.log('clicked save');
+  },
+ 
+  render: function() {
+    return (
+      <div>
+        <button onClick={this.openModal}>Add Recipe</button>
+        <Modal
+          isOpen={this.state.modalIsOpen}
+          onRequestClose={this.closeModal}
+          style={customStyles} >
+ 
+          <p className="h4">Add a recipe <i className="fa fa-times" onClick={this.closeModal}></i></p>
+          {/*<button onClick={this.closeModal}>X</button>*/}
+
+          <form>
+          	<div className="form-group">
+    			<label htmlFor="recipe-name">Name</label>
+    			<input type="text" className="form-control" id="recipe-name" size="50" />
+  			</div>
+          	<div className="form-group">
+    			<label htmlFor="recipe-ingredients">Ingredients</label>
+    			<input type="text" className="form-control" id="recipe-ingredients" placeholder="enter ingredients separated by commas" size="50" />
+  			</div>
+  			<button type="submit" onClick={this.saveRecipe} className="btn btn-primary">Add Recipe</button> <button className="btn btn-default" onClick={this.closeModal}>Close</button>
+          </form>
+        </Modal>
+      </div>
+    );
+  }
+});
