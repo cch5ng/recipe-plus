@@ -5,12 +5,38 @@ import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
 //import './Modal.jsx';
 //import {Table, Column, Cell} from 'fixed-data-table';
-import './startup.js';
+//import './startup.js';
 var FixedDataTable = require('fixed-data-table');
 const {Table, Column, Cell} = FixedDataTable;
 
 var urlRecent = "http://fcctop100.herokuapp.com/api/fccusers/top/recent";
 var urlTotal = "http://fcctop100.herokuapp.com/api/fccusers/top/alltime";
+
+//TEST: try moving logic for indexeddb into this component; although I don't exactly think this is right
+const dbName = 'RecipeDB';
+//making db global so it can be accessed from the jsx
+var db;
+var request = indexedDB.open(dbName);
+request.onerror = function(event) {
+	alert("Database error: " + event.target.errorCode);
+};
+
+request.onupgradeneeded = function(event) {
+//try make db global so it can be accessed from MModal
+	db = event.target.result;
+
+	// Create an objectStore to hold information about our customers. We're
+	// going to use "ssn" as our key path because it's guaranteed to be
+	// unique - or at least that's what I was told during the kickoff meeting.
+	var objectStore = db.createObjectStore('recipes', { autoIncrement: true });
+
+	// Create an index to search customers by name. We may have duplicates
+	// so we can't use a unique index.
+	objectStore.createIndex("name", "name", { unique: false });
+
+	objectStore.add({name: 'cookie', ingredients: ['eggs', 'milk', 'vegetable oil', 'flour', 'salt', 'chocolate chips']});
+
+};
 
 export default class App extends React.Component {
 	constructor() {
@@ -126,7 +152,32 @@ var MModal = React.createClass({
   	});
   	console.log('ingredientsTrim: ' + ingredientsTrim);
   	console.log('length 0: ' + ingredientsTrim[0].length);
-  	console.log('length 1: ' + ingredientsTrim[1].length);
+  	//console.log('length 1: ' + ingredientsTrim[1].length);
+
+  	//writing to indexeddb
+  	var transaction = db.transaction(["recipes"], "readwrite");
+  	console.log('got here');
+
+	// Do something when all the data is added to the database.
+	transaction.oncomplete = function(event) {
+		console.log('db populated');
+	    //clear form
+	    var form = document.getElementById('recipeForm');
+	    form.reset();
+	};
+
+	transaction.onerror = function(event) {
+		alert("Database error: " + event.target.errorCode);
+	};
+
+	var objectStore = transaction.objectStore("recipes");
+	var newRecipe = {name: name, ingredients: ingredientsTrim};
+	objectStore.add(newRecipe);
+	request.onsuccess = function(event) {
+		//feeds redundant with oncomplete function
+		console.log('db populated');
+	};
+
   },
 
   setName: function(event) {
@@ -146,7 +197,7 @@ var MModal = React.createClass({
           <p className="h4">Add a recipe <i className="fa fa-times" onClick={this.closeModal}></i></p>
           {/*<button onClick={this.closeModal}>X</button>*/}
 
-          <form>
+          <form id="recipeForm">
           	<div className="form-group">
     			<label htmlFor="recipe-name">Name</label>
     			<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" />
