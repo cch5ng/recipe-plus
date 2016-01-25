@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "fixed-data-table": "^0.6.0",
+    "rc-collapse": "^1.4.4",
     "react": "^0.14.6",
     "react-dom": "^0.14.6",
     "react-modal": "^0.6.1"

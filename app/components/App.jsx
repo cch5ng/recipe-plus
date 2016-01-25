@@ -3,11 +3,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
-//import './Modal.jsx';
+import Collapse from 'rc-collapse';
+//rc-collapse css
+import './index.css';
+var Panel = Collapse.Panel;
 //import {Table, Column, Cell} from 'fixed-data-table';
 //import './startup.js';
 var FixedDataTable = require('fixed-data-table');
 const {Table, Column, Cell} = FixedDataTable;
+const pollInterval = 10000;
 
 var urlRecent = "http://fcctop100.herokuapp.com/api/fccusers/top/recent";
 var urlTotal = "http://fcctop100.herokuapp.com/api/fccusers/top/alltime";
@@ -90,10 +94,11 @@ const customStyles = {
 
 var RecipeSection = React.createClass({
 	getInitialState: function() {
-		return {data: []};
+		return {data: [], accordion: false};
 	},
 
-	componentDidMount: function() {
+	getRecipes: function() {
+
 		//let db;
 		var data = [];
 		var request = indexedDB.open(dbName);
@@ -117,7 +122,7 @@ var RecipeSection = React.createClass({
 					console.log('got all recipes');
 				}
 
-				console.log('length data: ' + data.length);
+				//console.log('length data: ' + data.length);
 			}
 		};
 
@@ -126,10 +131,32 @@ var RecipeSection = React.createClass({
 
 	},
 
+	componentDidMount: function() {
+		this.getRecipes();
+		setInterval(this.getRecipes, pollInterval);
+	},
+
+	getItems: function() {
+		var items = [];
+		console.log('length data: ' + this.state.data.length);
+		this.state.data.forEach(function(recipe, idx) {
+			var index = idx + 1;
+			items.push(
+				<Panel header={recipe.name} key={index}>
+					<p>{recipe.ingredients}</p>
+				</Panel>
+			);
+		});
+
+		console.log('length items: ' + items.length);
+		return items;
+	},
+
 	render: function() {
+		var accordion = this.state.accordion;
 		return (
 			<div>
-				<RecipeList data={this.state.data}/>
+				<Collapse accordion={accordion} activeKey={['1']} defaultActiveKey={['1']}>{this.getItems()}</Collapse>
 				<MModal />
 			</div>
 		);
