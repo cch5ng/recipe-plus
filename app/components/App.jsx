@@ -21,6 +21,7 @@ const dbName = 'RecipeDB';
 //making db global so it can be accessed from the jsx
 var db;
 var objectStore;
+var recipeAr = [];
 var request = indexedDB.open(dbName);
 request.onerror = function(event) {
 	alert("Database error: " + event.target.errorCode);
@@ -40,8 +41,43 @@ request.onupgradeneeded = function(event) {
 	objectStore.createIndex("name", "name", { unique: false });
 
 	objectStore.add({name: 'cookie', ingredients: ['eggs', 'milk', 'vegetable oil', 'flour', 'salt', 'chocolate chips']});
-
 };
+
+//opening db for query of recipes
+function getRecipes(cb) {
+	recipeAr = [];
+	request = indexedDB.open(dbName);
+	request.onerror = function(event) {
+		alert("Database error: " + event.target.errorCode);
+	};
+
+	request.onsuccess = function(event) {
+	//try make db global so it can be accessed from MModal
+		db = event.target.result;
+
+		var transaction = db.transaction(['recipes']);
+		objectStore = transaction.objectStore('recipes');
+		objectStore.openCursor().onsuccess = function(event) {
+			//console.log('got to getNames');
+			var cursor = event.target.result;
+			if (cursor) {
+				//console.log('cursor.value: ' + cursor.value);
+				recipeAr.push(cursor.value);
+				console.log('name: ' + cursor.value.name);
+				cursor.continue();
+			} else {
+				console.log('got all recipes');
+				if (cb) {
+					cb();
+				}
+			}
+
+			//console.log('length data: ' + data.length);
+		}
+	};
+}
+
+getRecipes();
 
 export default class App extends React.Component {
 	constructor() {
@@ -49,10 +85,8 @@ export default class App extends React.Component {
 		this.state = {data:[], url: urlRecent};
 	}
 
-	componentDidMount() {
-
-	}
-
+	// componentDidMount() {
+	// }
 
 	render() {
 
@@ -94,7 +128,7 @@ const customStyles = {
 
 var RecipeSection = React.createClass({
 	getInitialState: function() {
-		return {data: [], accordion: false};
+		return {data: recipeAr, accordion: false};
 	},
 
 	getRecipes: function() {
@@ -111,10 +145,10 @@ var RecipeSection = React.createClass({
 			db = event.target.result;
 			var objectStore = db.transaction('recipes').objectStore('recipes');
 			objectStore.openCursor().onsuccess = function(event) {
-				console.log('got to getNames');
+				//console.log('got to getNames');
 				var cursor = event.target.result;
 				if (cursor) {
-					console.log('cursor.value: ' + cursor.value);
+					//console.log('cursor.value: ' + cursor.value);
 					data.push(cursor.value);
 					console.log('name: ' + cursor.value.name);
 					cursor.continue();
@@ -131,14 +165,14 @@ var RecipeSection = React.createClass({
 
 	},
 
-	componentDidMount: function() {
-		this.getRecipes();
-		setInterval(this.getRecipes, pollInterval);
-	},
+	// componentDidMount: function() {
+	// 	//this.getRecipes();
+	// 	//setInterval(this.getRecipes, pollInterval);
+	// },
 
 	getItems: function() {
 		var items = [];
-		console.log('length data: ' + this.state.data.length);
+		console.log('length data from RecipeSection: ' + this.state.data.length);
 		this.state.data.forEach(function(recipe, idx) {
 			var index = idx + 1;
 			items.push(
@@ -148,7 +182,7 @@ var RecipeSection = React.createClass({
 			);
 		});
 
-		console.log('length items: ' + items.length);
+		//console.log('length items: ' + items.length);
 		return items;
 	},
 
@@ -156,7 +190,7 @@ var RecipeSection = React.createClass({
 		var accordion = this.state.accordion;
 		return (
 			<div>
-				<Collapse accordion={accordion} activeKey={['1']} defaultActiveKey={['1']}>{this.getItems()}</Collapse>
+				<RecipeList data={this.state.data} />
 				<MModal />
 			</div>
 		);
@@ -172,10 +206,11 @@ var RecipeList = React.createClass({
 
 	render: function() {
 		//this.getNames();
-		console.log('props.data: ' + this.props.data);
+		//console.log('props.data: ' + this.props.data);
 		var recipeNodes = this.props.data.map(function(recipe) {
 			return (
-				<Recipe key={recipe.name} data={recipe.name}>
+				<Recipe key={recipe.name} data={recipe}>
+					{recipe.name}
 				</Recipe>
 			);
 		});
@@ -191,13 +226,37 @@ var RecipeList = React.createClass({
 });
 
 var Recipe = React.createClass({
-  render: function() {
-    return (
-        <li className="recipe">
-          {this.props.data}
-	    </li>
-    );
-  }
+	render: function() {
+		console.log('Recipe props.data: ' + this.props.data);
+		return (
+			<div className="recipe">
+				{this.props.data.name}
+				<IngredientList data={this.props.data.ingredients} />
+			</div>
+		);
+	}
+});
+
+var IngredientList = React.createClass({
+	render: function() {
+		let ingredientsAr = this.props.data;
+		console.log('length ingredientsAr: ' + ingredientsAr.length);
+		var ingredientNodes = this.props.data.map(function(ingred) {
+			return (
+				<li className="ingredient">
+					{ingred}
+				</li>
+			);
+		});
+
+		return (
+			<div className="ingredientList">
+				<ul>
+				{ingredientNodes}
+				</ul>
+			</div>
+		);
+	}
 });
 
 var MModal = React.createClass({
@@ -211,7 +270,7 @@ var MModal = React.createClass({
 	},
 
 	closeModal: function(event) {
-		//event.preventDefault();
+		event.preventDefault();
 		this.setState({modalIsOpen: false});
 	},
 
@@ -232,18 +291,16 @@ var MModal = React.createClass({
 			var itemCopy = item.slice(0).trim();
 			ingredientsTrim.push(itemCopy);
 		});
-		console.log('ingredientsTrim: ' + ingredientsTrim);
-		console.log('length 0: ' + ingredientsTrim[0].length);
+		//console.log('ingredientsTrim: ' + ingredientsTrim);
+		//console.log('length 0: ' + ingredientsTrim[0].length);
 		//console.log('length 1: ' + ingredientsTrim[1].length);
 
 		//writing to indexeddb
 		var transaction = db.transaction(["recipes"], "readwrite");
-		console.log('got here');
 
 		// Do something when all the data is added to the database.
 		transaction.oncomplete = function(event) {
-			console.log('db populated');
-			//clear form
+			//console.log('db populated');
 			var form = document.getElementById('recipeForm');
 			form.reset();
 		};
@@ -257,8 +314,13 @@ var MModal = React.createClass({
 		objectStore.add(newRecipe);
 		request.onsuccess = function(event) {
 			//feeds redundant with oncomplete function
-			console.log('db populated');
+			//console.log('db populated');
 		};
+//TODO here should also reset the session data var so all latest recipes display
+		getRecipes(function() {
+			MModal.setState({data: recipeAr})
+		});
+
 	},
 
 
