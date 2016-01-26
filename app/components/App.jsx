@@ -6,90 +6,24 @@ import Modal from 'react-modal';
 import Collapse from 'rc-collapse';
 //rc-collapse css
 import './index.css';
+import Startup from '../startup.js';
+//import '../startup.js';
 var Panel = Collapse.Panel;
 //import {Table, Column, Cell} from 'fixed-data-table';
 //import './startup.js';
-var FixedDataTable = require('fixed-data-table');
-const {Table, Column, Cell} = FixedDataTable;
-const pollInterval = 10000;
+// var FixedDataTable = require('fixed-data-table');
+// const {Table, Column, Cell} = FixedDataTable;
+// const pollInterval = 10000;
 
-var urlRecent = "http://fcctop100.herokuapp.com/api/fccusers/top/recent";
-var urlTotal = "http://fcctop100.herokuapp.com/api/fccusers/top/alltime";
-
-//TEST: try moving logic for indexeddb into this component; although I don't exactly think this is right
-const dbName = 'RecipeDB';
-//making db global so it can be accessed from the jsx
-var db;
-var objectStore;
-var recipeAr = [];
-var request = indexedDB.open(dbName);
-request.onerror = function(event) {
-	alert("Database error: " + event.target.errorCode);
-};
-
-request.onupgradeneeded = function(event) {
-//try make db global so it can be accessed from MModal
-	db = event.target.result;
-
-	// Create an objectStore to hold information about our customers. We're
-	// going to use "ssn" as our key path because it's guaranteed to be
-	// unique - or at least that's what I was told during the kickoff meeting.
-	objectStore = db.createObjectStore('recipes', { autoIncrement: true });
-
-	// Create an index to search customers by name. We may have duplicates
-	// so we can't use a unique index.
-	objectStore.createIndex("name", "name", { unique: false });
-
-	objectStore.add({name: 'cookie', ingredients: ['eggs', 'milk', 'vegetable oil', 'flour', 'salt', 'chocolate chips']});
-};
-
-//opening db for query of recipes
-function getRecipes(cb) {
-	recipeAr = [];
-	request = indexedDB.open(dbName);
-	request.onerror = function(event) {
-		alert("Database error: " + event.target.errorCode);
-	};
-
-	request.onsuccess = function(event) {
-	//try make db global so it can be accessed from MModal
-		db = event.target.result;
-
-		var transaction = db.transaction(['recipes']);
-		objectStore = transaction.objectStore('recipes');
-		objectStore.openCursor().onsuccess = function(event) {
-			//console.log('got to getNames');
-			var cursor = event.target.result;
-			if (cursor) {
-				//console.log('cursor.value: ' + cursor.value);
-				recipeAr.push(cursor.value);
-				console.log('name: ' + cursor.value.name);
-				cursor.continue();
-			} else {
-				console.log('got all recipes');
-				if (cb) {
-					cb();
-				}
-			}
-
-			//console.log('length data: ' + data.length);
-		}
-	};
-}
-
-getRecipes();
+//TEST access to Startup functions
+console.log('Startup.getRecipes(): ' + Startup.getRecipes());
 
 export default class App extends React.Component {
 	constructor() {
 		super();
-		this.state = {data:[], url: urlRecent};
 	}
 
-	// componentDidMount() {
-	// }
-
 	render() {
-
 		return (
 			<div className="container-fluid" >
 				<div className="row">
@@ -127,89 +61,32 @@ const customStyles = {
 };
 
 var RecipeSection = React.createClass({
-	getInitialState: function() {
-		return {data: recipeAr, accordion: false};
-	},
-
-	getRecipes: function() {
-
-		//let db;
-		var data = [];
-		var request = indexedDB.open(dbName);
-		request.onerror = function(event) {
-			alert("Database error: " + event.target.errorCode);
-		};
-
-		request.onsuccess = function(event) {
-		//try make db global so it can be accessed from MModal
-			db = event.target.result;
-			var objectStore = db.transaction('recipes').objectStore('recipes');
-			objectStore.openCursor().onsuccess = function(event) {
-				//console.log('got to getNames');
-				var cursor = event.target.result;
-				if (cursor) {
-					//console.log('cursor.value: ' + cursor.value);
-					data.push(cursor.value);
-					console.log('name: ' + cursor.value.name);
-					cursor.continue();
-				} else {
-					console.log('got all recipes');
-				}
-
-				//console.log('length data: ' + data.length);
-			}
-		};
-
-		this.setState({data: data});
-		console.log('recipesection data state: ' + this.state.data);
-
-	},
-
-	// componentDidMount: function() {
-	// 	//this.getRecipes();
-	// 	//setInterval(this.getRecipes, pollInterval);
-	// },
-
-	getItems: function() {
-		var items = [];
-		console.log('length data from RecipeSection: ' + this.state.data.length);
-		this.state.data.forEach(function(recipe, idx) {
-			var index = idx + 1;
-			items.push(
-				<Panel header={recipe.name} key={index}>
-					<p>{recipe.ingredients}</p>
-				</Panel>
-			);
-		});
-
-		//console.log('length items: ' + items.length);
-		return items;
+	getNames: function() {
+		return Startup.getRecipes();
 	},
 
 	render: function() {
-		var accordion = this.state.accordion;
+		//var accordion = this.state.accordion;
 		return (
 			<div>
-				<RecipeList data={this.state.data} />
-				<MModal />
+				<RecipeList data={this.getNames()} /> {/* data={this.state.data} */}
+				<MModalAdd />
+{/* TODO recipe edit modal */}
+				{/*<MModalEdit />*/}
 			</div>
 		);
 	}
 });
 
 var RecipeList = React.createClass({
-
-	// getNames: function() {
-	// 	var data = [];
-	// 	//return data;
-	// },
-
 	render: function() {
-		//this.getNames();
-		//console.log('props.data: ' + this.props.data);
+//BUG, error here
+//this.props.data undefined
+		console.log('RecipeList props.data: ' + this.props.data);
+
 		var recipeNodes = this.props.data.map(function(recipe) {
 			return (
-				<Recipe key={recipe.name} data={recipe}>
+				<Recipe key={recipe.name} data={recipe.name}>
 					{recipe.name}
 				</Recipe>
 			);
@@ -218,6 +95,10 @@ var RecipeList = React.createClass({
 		return (
 			<div className="recipeList">
 				<ul>
+{/*}					<li>
+					Recipe Name
+					<IngredientsList />
+					</li>*/}
 				{recipeNodes}
 				</ul>
 			</div>
@@ -227,39 +108,41 @@ var RecipeList = React.createClass({
 
 var Recipe = React.createClass({
 	render: function() {
-		console.log('Recipe props.data: ' + this.props.data);
+		//console.log('Recipe props.data: ' + this.props.data);
 		return (
 			<div className="recipe">
-				{this.props.data.name}
-				<IngredientList data={this.props.data.ingredients} />
+				{/*this.props.data.name*/}
+				<IngredientList data={this.props.data} /> {/* data={this.props.data.ingredients} */}
 			</div>
 		);
 	}
 });
 
-var IngredientList = React.createClass({
+var IngredientsList = React.createClass({
 	render: function() {
-		let ingredientsAr = this.props.data;
-		console.log('length ingredientsAr: ' + ingredientsAr.length);
-		var ingredientNodes = this.props.data.map(function(ingred) {
-			return (
-				<li className="ingredient">
-					{ingred}
-				</li>
-			);
-		});
+		//let ingredientsAr = this.props.data;
+		// console.log('length ingredientsAr: ' + ingredientsAr.length);
+		// var ingredientNodes = this.props.data.map(function(ingred) {
+		// 	return (
+		// 		<li className="ingredient">
+		// 			{ingred}
+		// 		</li>
+		// 	);
+		// });
 
 		return (
 			<div className="ingredientList">
 				<ul>
-				{ingredientNodes}
+					<li>ingred 1</li>
+					<li>ingred 2</li>
+				{/*ingredientNodes*/}
 				</ul>
 			</div>
 		);
 	}
 });
 
-var MModal = React.createClass({
+var MModalAdd = React.createClass({
 
 	getInitialState: function() {
 		return { modalIsOpen: false };
@@ -355,13 +238,5 @@ var MModal = React.createClass({
 					</Modal>
 				</div>
 		);
-	}
-});
-
-var RecipieList = React.createClass({
-
-
-	render: function() {
-
 	}
 });
