@@ -1,10 +1,12 @@
 //app/Startup.js
-'use strict';
+// 'use strict';
 
-const dbName = 'RecipeDB';
 
-var Startup = {
-	initializeDb: function() {
+// var Startup = {
+// 	initializeDb: function() {
+
+(function() {
+	const dbName = 'RecipeDB';
 		let db, objectStore, recipeAr = [];
 		let request = indexedDB.open(dbName);
 		request.onerror = function(event) {
@@ -26,46 +28,50 @@ var Startup = {
 
 			objectStore.add({name: 'cookie', ingredients: ['eggs', 'milk', 'vegetable oil', 'flour', 'salt', 'chocolate chips']});
 		};
-	},
 
-	getRecipes: function(cb) {
-		let db, objectStore, recipeAr = [];
-		let request = indexedDB.open(dbName);
-		request.onerror = function(event) {
-			alert("Database error: " + event.target.errorCode);
-		};
+}());
 
-		request.onsuccess = function(event) {
-		//try make db global so it can be accessed from MModal
-			db = event.target.result;
+//	},
 
-			var transaction = db.transaction(['recipes']);
-			objectStore = transaction.objectStore('recipes');
-			objectStore.openCursor().onsuccess = function(event) {
-				//console.log('got to getNames');
-				var cursor = event.target.result;
-				if (cursor) {
-					//console.log('cursor.value: ' + cursor.value);
-					recipeAr.push(cursor.value);
-					console.log('name: ' + cursor.value.name);
-					cursor.continue();
-				} else {
-					console.log('got all recipes');
-					if (cb) {
-						cb();
-					}
-					console.log('before return length recipeAr: ' + recipeAr.length);
-					return recipeAr;
-				}
-			};
-		};
-	},
+	// getRecipes: function(cb) {
+	// 	let db, objectStore, recipeAr = [];
+	// 	let request = indexedDB.open(dbName);
+	// 	request.onerror = function(event) {
+	// 		alert("Database error: " + event.target.errorCode);
+	// 	};
+
+	// 	request.onsuccess = function(event) {
+	// 	//try make db global so it can be accessed from MModal
+	// 		db = event.target.result;
+
+	// 		var transaction = db.transaction(['recipes']);
+	// 		objectStore = transaction.objectStore('recipes');
+	// 		objectStore.openCursor().onsuccess = function(event) {
+	// 			//console.log('got to getNames');
+	// 			var cursor = event.target.result;
+	// 			if (cursor) {
+	// 				//console.log('cursor.value: ' + cursor.value);
+	// 				recipeAr.push(cursor.value);
+	// 				console.log('name: ' + cursor.value.name);
+	// 				cursor.continue();
+	// 			} else {
+	// 				console.log('got all recipes');
+	// 				if (cb) {
+	// 					console.log('cb ');
+	// 					cb(recipeAr);
+	// 				}
+	// 				console.log('before return length recipeAr: ' + recipeAr.length);
+	// 				return recipeAr;
+	// 			}
+	// 		};
+	// 	};
+	// },
 
 	// getIngredients: function(name) {
-		
+
 	// }
 
-};
+//};
 
 
 //TEST run indexeddb initialization code in an IIFE so it is available when the recipes must be rendered
@@ -87,6 +93,6 @@ var Startup = {
 // 	console.log('from iife length recipeAr: ' + recipeAr.length);
 // }());
 
-Startup.initializeDb();
+// Startup.initializeDb();
 
-module.exports = Startup;
+// module.exports = Startup;
