@@ -134,13 +134,28 @@ var RecipeList = React.createClass({
 });
 
 var Recipe = React.createClass({
+	//concatenate names (removing spaces), otherwise the class name used to select a particular recipe name would break due to spaces
+	concatName: function() {
+		let nameAr = this.props.data.split(' ');
+		let nameStr = nameAr.join('');
+		return nameStr;
+	},
+
+	toggleIngredients: function() {
+		var ingredientsBox = $('.'+ this.concatName()).toggleClass('hidden');
+	},
+
 	render: function() {
-		//console.log('Recipe props.data: ' + this.props.data);
+		let classStr = this.concatName() + ' hidden';
 		return (
-			<div className="recipe">
-				{this.props.data}
-				<IngredientsList data={this.props.data}/>
-				<Buttons data={this.props.data} />
+			<div className="recipe clear">
+				<p className="h4" onClick={this.toggleIngredients}>{this.props.data}</p>
+				<div className={classStr}>
+					<IngredientsList data={this.props.data}/>
+					<div>
+						<Buttons data={this.props.data} />
+					</div>
+				</div>
 			</div>
 		);
 	}
@@ -185,18 +200,15 @@ var Buttons = React.createClass({
 
 	render: function() {
 		return (
-			<div>
-				<button data={this.props.data} onClick={this.deleteRecipe} >Delete</button>
-			{/* <MModalEdit></MModalEdit> */}
+			<div >
+				<li className="buttons"><button data={this.props.data} onClick={this.deleteRecipe} >Delete</button></li>
+				<li className="buttons"><MModalEdit></MModalEdit></li>
 			</div>
 			);
 	}
 });
 
 var MModalAdd = React.createClass({
-
-	getRecipes: function() {
-	},
 
 	getInitialState: function() {
 		return { modalIsOpen: false, names: []};
@@ -261,17 +273,11 @@ var MModalAdd = React.createClass({
 
 	},
 
-
-	//setName: function(event) {
-		//var name = event.target.recipeName.value;
-		//this.setState({name: name});
-	//},
-
 	render: function() {
 		return (
 
-				<div>
-					<button onClick={this.openModal}>Add Recipe</button>
+				<div className="clear">
+					<button onClick={this.openModal} >Add Recipe</button>
 					<Modal
 						isOpen={this.state.modalIsOpen}
 						onRequestClose={this.closeModal}
@@ -289,6 +295,105 @@ var MModalAdd = React.createClass({
 								<input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" placeholder="enter ingredients separated by commas" size="50" />
 							</div>
 							<button type="submit" onClick={this.saveRecipe} className="btn btn-primary">Add Recipe</button> <button className="btn btn-default" onClick={this.closeModal}>Close</button>
+						</form>
+					</Modal>
+				</div>
+		);
+	}
+});
+
+var MModalEdit = React.createClass({
+
+	getInitialState: function() {
+		return { modalIsOpen: false, names: []};
+	},
+
+	componentDidMount: function() {
+		let namesAr = [];
+		this.setState({names: namesAr});
+		// console.log('names: ' + this.state.names);
+	},
+
+	openModal: function() {
+		this.setState({modalIsOpen: true});
+	},
+
+	closeModal: function(event) {
+		event.preventDefault();
+		this.setState({modalIsOpen: false});
+//TODO hardcoded a browser refresh to get the latest list of recipes but I don't think this is the best way
+		document.location.reload(true);
+//TODO how to get the recipe list to update when the modal is closed
+		//RecipeList.render();
+	},
+
+//TODO
+	getIngredients: function() {
+		console.log('TODO');
+	},
+//TODO
+	editRecipe: function(event) {
+		event.preventDefault();
+
+//parsing the ingredients, cleaning up the format so it will display cleanly later on
+		// console.log('clicked save');
+		var name = document.getElementById('recipeName').value;
+		// console.log('name: ' + name);
+		var ingredientsStr = document.getElementById('recipeIngredients').value;
+		// console.log('ingredientsStr: ' + ingredientsStr);
+		var ingredientsAr = ingredientsStr.split(',');
+	//stores final array of ingredients strings, trimmed
+		var ingredientsTrim = [];
+		// console.log('ingredientsAr: ' + ingredientsAr);
+		// console.log('length ingredientsAr: ' + ingredientsAr.length);
+		ingredientsAr.forEach(function(item) {
+			// console.log('item: ' + item);
+			var itemCopy = item.slice(0).trim();
+			ingredientsTrim.push(itemCopy);
+		});
+		//making the ingredients list in localStorage comma delimited but no space
+		var ingredientsStrClean = ingredientsTrim.join(',');
+		console.log('ingredientsStrClean: ' + ingredientsStrClean);
+
+//updating localStorage
+		localStorage.setItem(name, ingredientsStrClean);
+
+//TODO here should also reset the session data var so all latest recipes display
+		let namesAr = [];
+		namesAr.push(name);
+		this.setState({names: ingredientsTrim});
+
+		let form = document.getElementById('recipeForm');
+		form.reset();
+
+		// getRecipes(function() {
+		// 	MModal.setState({data: recipeAr})
+		// });
+
+	},
+
+	render: function() {
+		return (
+
+				<div>
+					<button onClick={this.openModal}>Edit</button>
+					<Modal
+						isOpen={this.state.modalIsOpen}
+						onRequestClose={this.closeModal}
+						style={customStyles} >
+						<p className="h4">Edit recipe <i className="fa fa-times" onClick={this.closeModal}></i></p>
+						{/*<button onClick={this.closeModal}>X</button>*/}
+
+						<form id="recipeForm">
+							<div className="form-group">
+								<label htmlFor="recipe-name">Name</label>
+								<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" />
+							</div>
+							<div className="form-group">
+								<label htmlFor="recipe-ingredients">Ingredients</label>
+								<input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" placeholder="enter ingredients separated by commas" size="50" />
+							</div>
+							<button type="submit" onClick={this.editRecipe} className="btn btn-primary">Edit Recipe</button> <button className="btn btn-default" onClick={this.closeModal}>Close</button>
 						</form>
 					</Modal>
 				</div>

@@ -37,6 +37,20 @@ body {
 	text-align: center;
 }
 
+.buttons {
+	float: left;
+	list-style: none;
+}
+
+.clear {
+	clear: both;
+}
+
+.hidden {
+	display: none;
+}
+
+
 input {
 	width: 200px;
 }
