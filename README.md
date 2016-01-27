@@ -10,10 +10,12 @@
 
 ## Status
 
-* TODO: restructure recipe list into an accordion component
-* TODO: implement view logic, create component for viewing recipes list and individual recipe details
 * TODO: implement edit logic
-* TODO: implement delete logic
+* FIX: want the main list to refresh (update state for RecipeList) whenever the modal is updated (save, edit, delete)
+* STYLE: make everything look beautiful
+* DONE: restructure recipe list into an accordion component
+* DONE: implement view logic, create component for viewing recipes list and individual recipe details
+* DONE: implement delete logic
 
 * wondering if I need to clear memory for db ever
 * could I have resolved the scope issue with import
