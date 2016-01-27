@@ -84,11 +84,12 @@ var RecipeList = React.createClass({
 	},
 
 	getNames: function() {
-		let namesStr;
+		let namesStr = '';
 		let namesCount;
 		namesCount = localStorage.length;
 		console.log('namesCount: ' + namesCount);
 		for (let i = 0; i < namesCount; i++) {
+			//(namesCount - 1) prevents extra empty list item at the bottom
 			if (i < namesCount - 1) {
 				namesStr += localStorage.key(i) + ',';
 			} else {
@@ -139,6 +140,7 @@ var Recipe = React.createClass({
 			<div className="recipe">
 				{this.props.data}
 				<IngredientsList data={this.props.data}/>
+				<Buttons data={this.props.data} />
 			</div>
 		);
 	}
@@ -152,7 +154,8 @@ var IngredientsList = React.createClass({
 		ingredientsStr = localStorage.getItem(this.props.data);
 		console.log('ingredientsStr: ' + ingredientsStr);
 		if (ingredientsStr) {
-			ingredientsAr = ingredientsStr.split(', ');
+//on data input to localStorage, spaces are trimmed so list should be strictly comma-delimited
+			ingredientsAr = ingredientsStr.split(',');
 		}
 		// console.log('length ingredientsAr: ' + ingredientsAr.length);
 		var ingredientNodes = ingredientsAr.map(function(ingred) {
@@ -173,34 +176,26 @@ var IngredientsList = React.createClass({
 	}
 });
 
+var Buttons = React.createClass({
+	deleteRecipe: function() {
+		console.log('deleting recipe: ' + this.props.data);
+		localStorage.removeItem(this.props.data);
+//TODO this event should also result in updating the RecipeList view
+	},
+
+	render: function() {
+		return (
+			<div>
+				<button data={this.props.data} onClick={this.deleteRecipe} >Delete</button>
+			{/* <MModalEdit></MModalEdit> */}
+			</div>
+			);
+	}
+});
+
 var MModalAdd = React.createClass({
 
 	getRecipes: function() {
-		// const dbName = 'RecipeDB';
-		// let db, objectStore, recipeAr = [];
-		// let request = indexedDB.open(dbName);
-		// let namesAr = [];
-		// request.onerror = function(event) {
-		// 	alert("Database error: " + event.target.errorCode);
-		// };
-
-		// request.onsuccess = function(event) {
-		// //try make db global so it can be accessed from MModal
-		// 	db = event.target.result;
-		// 	var transaction = db.transaction(['recipes']);
-		// 	objectStore = transaction.objectStore('recipes');
-		// 	objectStore.openCursor().onsuccess = function(event) {
-		// 		var cursor = event.target.result;
-		// 		if (cursor) {
-		// 			namesAr.push(cursor.value.name);
-		// 			cursor.continue();
-		// 		} else {
-		// 			console.log('got all recipes');
-
-		// 			return namesAr;
-		// 		}
-		// 	};
-		// };
 	},
 
 	getInitialState: function() {
@@ -220,12 +215,16 @@ var MModalAdd = React.createClass({
 	closeModal: function(event) {
 		event.preventDefault();
 		this.setState({modalIsOpen: false});
+//TODO hardcoded a browser refresh to get the latest list of recipes but I don't think this is the best way
+		document.location.reload(true);
+//TODO how to get the recipe list to update when the modal is closed
+		//RecipeList.render();
 	},
 
 	saveRecipe: function(event) {
 		event.preventDefault();
 
-//parsing the ingredients
+//parsing the ingredients, cleaning up the format so it will display cleanly later on
 		// console.log('clicked save');
 		var name = document.getElementById('recipeName').value;
 		// console.log('name: ' + name);
@@ -241,46 +240,21 @@ var MModalAdd = React.createClass({
 			var itemCopy = item.slice(0).trim();
 			ingredientsTrim.push(itemCopy);
 		});
-		//console.log('ingredientsTrim: ' + ingredientsTrim);
-		//console.log('length 0: ' + ingredientsTrim[0].length);
-		//console.log('length 1: ' + ingredientsTrim[1].length);
+		//making the ingredients list in localStorage comma delimited but no space
+		var ingredientsStrClean = ingredientsTrim.join(',');
+		console.log('ingredientsStrClean: ' + ingredientsStrClean);
 
-		// const dbName = 'RecipeDB';
-		// let db, objectStore, recipeAr = [];
-		// let request = indexedDB.open(dbName);
-		// request.onerror = function(event) {
-		// 	alert("Database error: " + event.target.errorCode);
-		// };
-
-		// request.onsuccess = function(event) {
-		// //try make db global so it can be accessed from MModal
-		// 	db = event.target.result;
-
-		// 	//writing to indexeddb
-		// 	var transaction = db.transaction(["recipes"], "readwrite");
-
-		// 	// Do something when all the data is added to the database.
-		// 	transaction.oncomplete = function(event) {
-		// 		//console.log('db populated');
-		// 		var form = document.getElementById('recipeForm');
-		// 		form.reset();
-		// 	};
-
-		// 	transaction.onerror = function(event) {
-		// 		alert("Database error: " + event.target.errorCode);
-		// 	};
-
-		// 	var objectStore = transaction.objectStore("recipes");
-		// 	var newRecipe = {name: name, ingredients: ingredientsTrim};
-		// 	objectStore.add(newRecipe);
-
-		// };
+//updating localStorage
+		localStorage.setItem(name, ingredientsStrClean);
 
 //TODO here should also reset the session data var so all latest recipes display
 		let namesAr = [];
-		//this.state.names;
 		namesAr.push(name);
-		this.setState({names: namesAr});
+		this.setState({names: ingredientsTrim});
+
+		let form = document.getElementById('recipeForm');
+		form.reset();
+
 		// getRecipes(function() {
 		// 	MModal.setState({data: recipeAr})
 		// });
