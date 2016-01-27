@@ -6,7 +6,7 @@ import Modal from 'react-modal';
 import Collapse from 'rc-collapse';
 //rc-collapse css
 import './index.css';
-import '../Startup.js';
+import '../startup.js';
 //import '../startup.js';
 var Panel = Collapse.Panel;
 //import {Table, Column, Cell} from 'fixed-data-table';
@@ -83,46 +83,20 @@ var RecipeList = React.createClass({
 		this.setState({names: namesAr});
 	},
 
-	getRecipes: function() {
-		const dbName = 'RecipeDB';
-		let db, objectStore, recipeAr = [];
-		let request = indexedDB.open(dbName);
-		let namesAr = [];
-		request.onerror = function(event) {
-			alert("Database error: " + event.target.errorCode);
-		};
-
-		request.onsuccess = function(event) {
-		//try make db global so it can be accessed from MModal
-			db = event.target.result;
-
-			var transaction = db.transaction(['recipes']);
-			objectStore = transaction.objectStore('recipes');
-			objectStore.openCursor().onsuccess = function(event) {
-				//console.log('got to getNames');
-				var cursor = event.target.result;
-				if (cursor) {
-					//console.log('cursor.value: ' + cursor.value);
-					namesAr.push(cursor.value.name);
-					console.log('name: ' + cursor.value.name);
-					cursor.continue();
-				} else {
-					console.log('got all recipes');
-					console.log('before return length namesAr: ' + namesAr.length);
-
-					setNamesState.call(RecipeList, namesAr);
-
-					return namesAr;
-//					this.setState({name: namesAr});
-
-					// if (cb) {
-					// 	cb(recipeAr);
-					// }
-
-					//return recipeAr;
-				}
-			};
-		};
+	getNames: function() {
+		let namesStr;
+		let namesCount;
+		namesCount = localStorage.length;
+		console.log('namesCount: ' + namesCount);
+		for (let i = 0; i < namesCount; i++) {
+			if (i < namesCount - 1) {
+				namesStr += localStorage.key(i) + ',';
+			} else {
+				namesStr += localStorage.key(i);
+			}
+		}
+		console.log('namesStr: ' + namesStr);
+		this.setState({names: namesStr});
 	},
 
 	getInitialState: function() {
@@ -130,31 +104,17 @@ var RecipeList = React.createClass({
 	},
 
 	componentDidMount: function() {
-//rAr param should be the array of recipe objects from Startup.getRecipes()
-		var curNames;
-		let namesAr = this.getRecipes();
-		setInterval(function() {
-			if (namesAr) {
-				console.log('length namesAr: ' + namesAr.length);
-				this.setState({names: namesAr});
-				this.render();
-			}
-		}, 3000);
-
-		// setInterval(this.checkCurNames, 5000, curNames);
-
+		this.getNames();
+		this.render();
 	},
 
-	// getDefaultProps: function() {
-	// 	return Startup.getRecipes();
-	// },
-
 	render: function() {
-//BUG, error here
-//this.props.data undefined
-		//console.log('RecipeList props.data: ' + this.props.data);
+		let namesAr = [];
+		console.log('this.state.names: ' + this.state.names);
+		namesAr = this.state.names.split(',');
+		console.log('namesAr: ' + namesAr);
 
-		var recipeNodes = this.state.names.map(function(recipe) {
+		var recipeNodes = namesAr.map(function(recipe) {
 			return (
 				<Recipe key={recipe} data={recipe}>
 					{recipe}
@@ -165,10 +125,6 @@ var RecipeList = React.createClass({
 		return (
 			<div className="recipeList">
 				<ul>
-{/*}					<li>
-					Recipe Name
-					<IngredientsList />
-					</li>*/}
 				{recipeNodes}
 				</ul>
 			</div>
@@ -181,8 +137,8 @@ var Recipe = React.createClass({
 		//console.log('Recipe props.data: ' + this.props.data);
 		return (
 			<div className="recipe">
-				{/*this.props.data.name*/}
-				<IngredientList data={this.props.data} /> {/* data={this.props.data.ingredients} */}
+				{this.props.data}
+				<IngredientsList data={this.props.data}/>
 			</div>
 		);
 	}
@@ -190,22 +146,27 @@ var Recipe = React.createClass({
 
 var IngredientsList = React.createClass({
 	render: function() {
-		//let ingredientsAr = this.props.data;
+		let ingredientsAr = [];
+		let ingredientsStr;
+		console.log('this.props.data: ' + this.props.data);
+		ingredientsStr = localStorage.getItem(this.props.data);
+		console.log('ingredientsStr: ' + ingredientsStr);
+		if (ingredientsStr) {
+			ingredientsAr = ingredientsStr.split(', ');
+		}
 		// console.log('length ingredientsAr: ' + ingredientsAr.length);
-		// var ingredientNodes = this.props.data.map(function(ingred) {
-		// 	return (
-		// 		<li className="ingredient">
-		// 			{ingred}
-		// 		</li>
-		// 	);
-		// });
+		var ingredientNodes = ingredientsAr.map(function(ingred) {
+			return (
+				<li className="ingredient">
+					{ingred}
+				</li>
+			);
+		});
 
 		return (
 			<div className="ingredientList">
 				<ul>
-					<li>ingred 1</li>
-					<li>ingred 2</li>
-				{/*ingredientNodes*/}
+					{ingredientNodes}
 				</ul>
 			</div>
 		);
@@ -215,31 +176,31 @@ var IngredientsList = React.createClass({
 var MModalAdd = React.createClass({
 
 	getRecipes: function() {
-		const dbName = 'RecipeDB';
-		let db, objectStore, recipeAr = [];
-		let request = indexedDB.open(dbName);
-		let namesAr = [];
-		request.onerror = function(event) {
-			alert("Database error: " + event.target.errorCode);
-		};
+		// const dbName = 'RecipeDB';
+		// let db, objectStore, recipeAr = [];
+		// let request = indexedDB.open(dbName);
+		// let namesAr = [];
+		// request.onerror = function(event) {
+		// 	alert("Database error: " + event.target.errorCode);
+		// };
 
-		request.onsuccess = function(event) {
-		//try make db global so it can be accessed from MModal
-			db = event.target.result;
-			var transaction = db.transaction(['recipes']);
-			objectStore = transaction.objectStore('recipes');
-			objectStore.openCursor().onsuccess = function(event) {
-				var cursor = event.target.result;
-				if (cursor) {
-					namesAr.push(cursor.value.name);
-					cursor.continue();
-				} else {
-					console.log('got all recipes');
+		// request.onsuccess = function(event) {
+		// //try make db global so it can be accessed from MModal
+		// 	db = event.target.result;
+		// 	var transaction = db.transaction(['recipes']);
+		// 	objectStore = transaction.objectStore('recipes');
+		// 	objectStore.openCursor().onsuccess = function(event) {
+		// 		var cursor = event.target.result;
+		// 		if (cursor) {
+		// 			namesAr.push(cursor.value.name);
+		// 			cursor.continue();
+		// 		} else {
+		// 			console.log('got all recipes');
 
-					return namesAr;
-				}
-			};
-		};
+		// 			return namesAr;
+		// 		}
+		// 	};
+		// };
 	},
 
 	getInitialState: function() {
@@ -248,12 +209,8 @@ var MModalAdd = React.createClass({
 
 	componentDidMount: function() {
 		let namesAr = [];
-		namesAr = this.getRecipes();
-		setTimeout(function() {
-			console.log('delay');
-		}, 5000);
 		this.setState({names: namesAr});
-		console.log('names: ' + this.state.names);
+		// console.log('names: ' + this.state.names);
 	},
 
 	openModal: function() {
@@ -288,36 +245,36 @@ var MModalAdd = React.createClass({
 		//console.log('length 0: ' + ingredientsTrim[0].length);
 		//console.log('length 1: ' + ingredientsTrim[1].length);
 
-		const dbName = 'RecipeDB';
-		let db, objectStore, recipeAr = [];
-		let request = indexedDB.open(dbName);
-		request.onerror = function(event) {
-			alert("Database error: " + event.target.errorCode);
-		};
+		// const dbName = 'RecipeDB';
+		// let db, objectStore, recipeAr = [];
+		// let request = indexedDB.open(dbName);
+		// request.onerror = function(event) {
+		// 	alert("Database error: " + event.target.errorCode);
+		// };
 
-		request.onsuccess = function(event) {
-		//try make db global so it can be accessed from MModal
-			db = event.target.result;
+		// request.onsuccess = function(event) {
+		// //try make db global so it can be accessed from MModal
+		// 	db = event.target.result;
 
-			//writing to indexeddb
-			var transaction = db.transaction(["recipes"], "readwrite");
+		// 	//writing to indexeddb
+		// 	var transaction = db.transaction(["recipes"], "readwrite");
 
-			// Do something when all the data is added to the database.
-			transaction.oncomplete = function(event) {
-				//console.log('db populated');
-				var form = document.getElementById('recipeForm');
-				form.reset();
-			};
+		// 	// Do something when all the data is added to the database.
+		// 	transaction.oncomplete = function(event) {
+		// 		//console.log('db populated');
+		// 		var form = document.getElementById('recipeForm');
+		// 		form.reset();
+		// 	};
 
-			transaction.onerror = function(event) {
-				alert("Database error: " + event.target.errorCode);
-			};
+		// 	transaction.onerror = function(event) {
+		// 		alert("Database error: " + event.target.errorCode);
+		// 	};
 
-			var objectStore = transaction.objectStore("recipes");
-			var newRecipe = {name: name, ingredients: ingredientsTrim};
-			objectStore.add(newRecipe);
+		// 	var objectStore = transaction.objectStore("recipes");
+		// 	var newRecipe = {name: name, ingredients: ingredientsTrim};
+		// 	objectStore.add(newRecipe);
 
-		};
+		// };
 
 //TODO here should also reset the session data var so all latest recipes display
 		let namesAr = [];

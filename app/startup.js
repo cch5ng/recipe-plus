@@ -1,98 +1,17 @@
-//app/Startup.js
-// 'use strict';
-
-
-// var Startup = {
-// 	initializeDb: function() {
+//app/startup.js
 
 (function() {
-	const dbName = 'RecipeDB';
-		let db, objectStore, recipeAr = [];
-		let request = indexedDB.open(dbName);
-		request.onerror = function(event) {
-			alert("Database error: " + event.target.errorCode);
-		};
-
-		request.onupgradeneeded = function(event) {
-		//try make db global so it can be accessed from MModal
-			db = event.target.result;
-
-			// Create an objectStore to hold information about our customers. We're
-			// going to use "ssn" as our key path because it's guaranteed to be
-			// unique - or at least that's what I was told during the kickoff meeting.
-			objectStore = db.createObjectStore('recipes', { autoIncrement: true });
-
-			// Create an index to search customers by name. We may have duplicates
-			// so we can't use a unique index.
-			objectStore.createIndex("name", "name", { unique: false });
-
-			objectStore.add({name: 'cookie', ingredients: ['eggs', 'milk', 'vegetable oil', 'flour', 'salt', 'chocolate chips']});
-		};
-
+	if (typeof(localStorage) == 'undefined' ) {
+		alert('Your browser does not support HTML5 localStorage. Try upgrading.');
+	} else {
+		try {
+			localStorage.setItem('chocolate chip cookies', 'butter, sugar, eggs, vanilla, flour, baking soda, hot water, salt, chocolate chips, walnuts'); //saves to the database, “key”, “value”
+			localStorage.setItem('tacos', 'sirloin steak, salt, black pepper, veg oil, corn tortillas, onion, jalapeno, cilantro, lime'); //saves to the database, “key”, “value”
+			localStorage.setItem('caramel macchiato ice cream', 'milk, instant coffee, sugar, salt, heavy cream, caramel sauce'); //saves to the database, “key”, “value”
+		} catch (e) {
+			if (e == QUOTA_EXCEEDED_ERR) {
+				alert('Quota exceeded!'); //data wasn’t successfully saved due to quota exceed so throw an error
+			}
+		}
+	}
 }());
-
-//	},
-
-	// getRecipes: function(cb) {
-	// 	let db, objectStore, recipeAr = [];
-	// 	let request = indexedDB.open(dbName);
-	// 	request.onerror = function(event) {
-	// 		alert("Database error: " + event.target.errorCode);
-	// 	};
-
-	// 	request.onsuccess = function(event) {
-	// 	//try make db global so it can be accessed from MModal
-	// 		db = event.target.result;
-
-	// 		var transaction = db.transaction(['recipes']);
-	// 		objectStore = transaction.objectStore('recipes');
-	// 		objectStore.openCursor().onsuccess = function(event) {
-	// 			//console.log('got to getNames');
-	// 			var cursor = event.target.result;
-	// 			if (cursor) {
-	// 				//console.log('cursor.value: ' + cursor.value);
-	// 				recipeAr.push(cursor.value);
-	// 				console.log('name: ' + cursor.value.name);
-	// 				cursor.continue();
-	// 			} else {
-	// 				console.log('got all recipes');
-	// 				if (cb) {
-	// 					console.log('cb ');
-	// 					cb(recipeAr);
-	// 				}
-	// 				console.log('before return length recipeAr: ' + recipeAr.length);
-	// 				return recipeAr;
-	// 			}
-	// 		};
-	// 	};
-	// },
-
-	// getIngredients: function(name) {
-
-	// }
-
-//};
-
-
-//TEST run indexeddb initialization code in an IIFE so it is available when the recipes must be rendered
-//(function() {
-	//TEST: try moving logic for indexeddb into this component; although I don't exactly think this is right
-	//making db global so it can be accessed from the jsx
-//TEST making vars db, objectStore and recipeAr global so they could be accessed from App.jsx
-	// var db;
-	// var objectStore;
-	// var recipeAr = [];
-
-
-	//opening db for query of recipes
-	// function getRecipes(cb) {
-
-	// }
-
-// 	getRecipes();
-// 	console.log('from iife length recipeAr: ' + recipeAr.length);
-// }());
-
-// Startup.initializeDb();
-
-// module.exports = Startup;
