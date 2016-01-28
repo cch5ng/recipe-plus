@@ -202,7 +202,7 @@ var Buttons = React.createClass({
 		return (
 			<div >
 				<li className="buttons"><button data={this.props.data} onClick={this.deleteRecipe} >Delete</button></li>
-				<li className="buttons"><MModalEdit></MModalEdit></li>
+				<li className="buttons"><MModalEdit data={this.props.data}></MModalEdit></li>
 			</div>
 			);
 	}
@@ -305,13 +305,7 @@ var MModalAdd = React.createClass({
 var MModalEdit = React.createClass({
 
 	getInitialState: function() {
-		return { modalIsOpen: false, names: []};
-	},
-
-	componentDidMount: function() {
-		let namesAr = [];
-		this.setState({names: namesAr});
-		// console.log('names: ' + this.state.names);
+		return { modalIsOpen: false, names: [], ingredients: this.getIngredients()};
 	},
 
 	openModal: function() {
@@ -322,7 +316,7 @@ var MModalEdit = React.createClass({
 		event.preventDefault();
 		this.setState({modalIsOpen: false});
 //TODO hardcoded a browser refresh to get the latest list of recipes but I don't think this is the best way
-		document.location.reload(true);
+		//document.location.reload(true);
 //TODO how to get the recipe list to update when the modal is closed
 		//RecipeList.render();
 	},
@@ -330,24 +324,29 @@ var MModalEdit = React.createClass({
 //TODO
 	getIngredients: function() {
 		console.log('TODO');
+		let ingredientsStr = localStorage.getItem(this.props.data);
+		console.log('ingredientsStr: ' + ingredientsStr);
+		return ingredientsStr;
 	},
+
+	updateIngredientsField: function(event) {
+		console.log('ingredients updated');
+		this.setState({ingredients: event.target.value});
+		console.log('this.state.ingredients: ' + this.state.ingredients);
+	},
+
 //TODO
 	editRecipe: function(event) {
 		event.preventDefault();
 
 //parsing the ingredients, cleaning up the format so it will display cleanly later on
 		// console.log('clicked save');
-		var name = document.getElementById('recipeName').value;
-		// console.log('name: ' + name);
-		var ingredientsStr = document.getElementById('recipeIngredients').value;
-		// console.log('ingredientsStr: ' + ingredientsStr);
+		var name = this.props.data
+		console.log('name: ' + name);
+		var ingredientsStr = this.state.ingredients;
 		var ingredientsAr = ingredientsStr.split(',');
-	//stores final array of ingredients strings, trimmed
 		var ingredientsTrim = [];
-		// console.log('ingredientsAr: ' + ingredientsAr);
-		// console.log('length ingredientsAr: ' + ingredientsAr.length);
 		ingredientsAr.forEach(function(item) {
-			// console.log('item: ' + item);
 			var itemCopy = item.slice(0).trim();
 			ingredientsTrim.push(itemCopy);
 		});
@@ -358,12 +357,7 @@ var MModalEdit = React.createClass({
 //updating localStorage
 		localStorage.setItem(name, ingredientsStrClean);
 
-//TODO here should also reset the session data var so all latest recipes display
-		let namesAr = [];
-		namesAr.push(name);
-		this.setState({names: ingredientsTrim});
-
-		let form = document.getElementById('recipeForm');
+		let form = document.getElementById('recipeEditForm');
 		form.reset();
 
 		// getRecipes(function() {
@@ -384,14 +378,14 @@ var MModalEdit = React.createClass({
 						<p className="h4">Edit recipe <i className="fa fa-times" onClick={this.closeModal}></i></p>
 						{/*<button onClick={this.closeModal}>X</button>*/}
 
-						<form id="recipeForm">
+						<form id="recipeEditForm">
 							<div className="form-group">
-								<label htmlFor="recipe-name">Name</label>
-								<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" />
+								<label htmlFor="recipeName">Name</label>
+								<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" value={this.props.data} readOnly />
 							</div>
 							<div className="form-group">
-								<label htmlFor="recipe-ingredients">Ingredients</label>
-								<input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" placeholder="enter ingredients separated by commas" size="50" />
+								<label htmlFor="recipeIngredientsEdit">Ingredients</label>
+								<input type="text" className="form-control" id="recipeIngredientsEdit" name="recipeIngredientsEdit" value={this.state.ingredients} onChange={this.updateIngredientsField} size="50" />
 							</div>
 							<button type="submit" onClick={this.editRecipe} className="btn btn-primary">Edit Recipe</button> <button className="btn btn-default" onClick={this.closeModal}>Close</button>
 						</form>
