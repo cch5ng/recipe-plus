@@ -3,20 +3,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
-import Collapse from 'rc-collapse';
-//rc-collapse css
-import './index.css';
 import '../startup.js';
-//import '../startup.js';
-var Panel = Collapse.Panel;
-//import {Table, Column, Cell} from 'fixed-data-table';
-//import './startup.js';
-// var FixedDataTable = require('fixed-data-table');
-// const {Table, Column, Cell} = FixedDataTable;
-// const pollInterval = 10000;
-
-//TEST access to Startup functions
-//console.log('Startup.getRecipes(): ' + Startup.getRecipes());
 
 export default class App extends React.Component {
 	constructor() {
@@ -35,11 +22,9 @@ export default class App extends React.Component {
 				</div>
 
 				<div className="recipeSection">
-					<RecipeList /> {/* data={this.getNames() data={this.state.data} */}
+					<RecipeList />
 					<MModalAdd />
 				</div>
-
-				{/*<RecipeSection />*/}
 
 				<div className="row footer">
 					<div className="col-xs-12 col-sm-12">
@@ -54,6 +39,7 @@ export default class App extends React.Component {
 	}
 }
 
+//used by MModals
 const customStyles = {
 	content : {
 		top                   : '50%',
@@ -64,19 +50,6 @@ const customStyles = {
 		transform             : 'translate(-50%, -50%)'
 	}
 };
-
-// var RecipeSection = React.createClass({
-// 	getNames: function() {
-// 		return Startup.getRecipes();
-// 	},
-
-// 	render: function() {
-// 		//var accordion = this.state.accordion;
-// 		return (
-			
-// 		);
-// 	}
-// });
 
 var RecipeList = React.createClass({
 	setNamesState: function(namesAr) {
@@ -101,7 +74,7 @@ var RecipeList = React.createClass({
 	},
 
 	getInitialState: function() {
-		return {names : []}; //data: Startup.getRecipes()
+		return {names : []};
 	},
 
 	componentDidMount: function() {
@@ -111,9 +84,9 @@ var RecipeList = React.createClass({
 
 	render: function() {
 		let namesAr = [];
-		console.log('this.state.names: ' + this.state.names);
+		//console.log('this.state.names: ' + this.state.names);
 		namesAr = this.state.names.split(',');
-		console.log('namesAr: ' + namesAr);
+		//console.log('namesAr: ' + namesAr);
 
 		var recipeNodes = namesAr.map(function(recipe) {
 			return (
@@ -129,12 +102,13 @@ var RecipeList = React.createClass({
 				{recipeNodes}
 				</ul>
 			</div>
-			);
+		);
 	}
 });
 
 var Recipe = React.createClass({
-	//concatenate names (removing spaces), otherwise the class name used to select a particular recipe name would break due to spaces
+	//concatenate names (removing spaces), otherwise the class name used to select a particular
+	//recipe name would break due to spaces
 	concatName: function() {
 		let nameAr = this.props.data.split(' ');
 		let nameStr = nameAr.join('');
@@ -152,10 +126,8 @@ var Recipe = React.createClass({
 				<p className="h4" onClick={this.toggleIngredients}>{this.props.data}</p>
 				<div className={classStr}>
 					<p className="h5">INGREDIENTS</p>
-					{/*<div>*/}
-						<IngredientsList data={this.props.data}/>
-						<Buttons data={this.props.data} />
-					{/*</div>*/}
+					<IngredientsList data={this.props.data}/>
+					<Buttons data={this.props.data} />
 				</div>
 			</div>
 		);
@@ -166,17 +138,19 @@ var IngredientsList = React.createClass({
 	render: function() {
 		let ingredientsAr = [];
 		let ingredientsStr;
-		console.log('this.props.data: ' + this.props.data);
+		let nameStr = this.props.data;
+		//console.log('this.props.data: ' + this.props.data);
 		ingredientsStr = localStorage.getItem(this.props.data);
-		console.log('ingredientsStr: ' + ingredientsStr);
+		//console.log('ingredientsStr: ' + ingredientsStr);
 		if (ingredientsStr) {
 //on data input to localStorage, spaces are trimmed so list should be strictly comma-delimited
 			ingredientsAr = ingredientsStr.split(',');
 		}
 		// console.log('length ingredientsAr: ' + ingredientsAr.length);
 		var ingredientNodes = ingredientsAr.map(function(ingred) {
+			let keyStr = trimSpaces(nameStr) + ingred;
 			return (
-				<div className="ingredient">
+				<div className="ingredient" key={keyStr} >
 					{ingred}
 				</div>
 			);
@@ -229,7 +203,6 @@ var MModalAdd = React.createClass({
 //TODO hardcoded a browser refresh to get the latest list of recipes but I don't think this is the best way
 		document.location.reload(true);
 //TODO how to get the recipe list to update when the modal is closed
-		//RecipeList.render();
 	},
 
 	saveRecipe: function(event) {
@@ -265,11 +238,6 @@ var MModalAdd = React.createClass({
 
 		let form = document.getElementById('recipeForm');
 		form.reset();
-
-		// getRecipes(function() {
-		// 	MModal.setState({data: recipeAr})
-		// });
-
 	},
 
 	render: function() {
@@ -282,7 +250,6 @@ var MModalAdd = React.createClass({
 						onRequestClose={this.closeModal}
 						style={customStyles} >
 						<p className="h4">Add a recipe <i className="fa fa-times" onClick={this.closeModal}></i></p>
-						{/*<button onClick={this.closeModal}>X</button>*/}
 
 						<form id="recipeForm">
 							<div className="form-group">
@@ -315,33 +282,26 @@ var MModalEdit = React.createClass({
 		event.preventDefault();
 		this.setState({modalIsOpen: false});
 //TODO hardcoded a browser refresh to get the latest list of recipes but I don't think this is the best way
-		//document.location.reload(true);
 //TODO how to get the recipe list to update when the modal is closed
-		//RecipeList.render();
 	},
 
-//TODO
 	getIngredients: function() {
-		console.log('TODO');
 		let ingredientsStr = localStorage.getItem(this.props.data);
-		console.log('ingredientsStr: ' + ingredientsStr);
+		//console.log('ingredientsStr: ' + ingredientsStr);
 		return ingredientsStr;
 	},
 
 	updateIngredientsField: function(event) {
-		console.log('ingredients updated');
 		this.setState({ingredients: event.target.value});
-		console.log('this.state.ingredients: ' + this.state.ingredients);
+		//console.log('this.state.ingredients: ' + this.state.ingredients);
 	},
 
-//TODO
 	editRecipe: function(event) {
 		event.preventDefault();
 
-//parsing the ingredients, cleaning up the format so it will display cleanly later on
-		// console.log('clicked save');
+	//parsing the ingredients, cleaning up the format so it will display cleanly later on
 		var name = this.props.data
-		console.log('name: ' + name);
+		//console.log('name: ' + name);
 		var ingredientsStr = this.state.ingredients;
 		var ingredientsAr = ingredientsStr.split(',');
 		var ingredientsTrim = [];
@@ -349,20 +309,14 @@ var MModalEdit = React.createClass({
 			var itemCopy = item.slice(0).trim();
 			ingredientsTrim.push(itemCopy);
 		});
-		//making the ingredients list in localStorage comma delimited but no space
 		var ingredientsStrClean = ingredientsTrim.join(',');
-		console.log('ingredientsStrClean: ' + ingredientsStrClean);
+		//console.log('ingredientsStrClean: ' + ingredientsStrClean);
 
-//updating localStorage
+	//updating localStorage
 		localStorage.setItem(name, ingredientsStrClean);
 
 		let form = document.getElementById('recipeEditForm');
 		form.reset();
-
-		// getRecipes(function() {
-		// 	MModal.setState({data: recipeAr})
-		// });
-
 	},
 
 	render: function() {
@@ -375,7 +329,6 @@ var MModalEdit = React.createClass({
 						onRequestClose={this.closeModal}
 						style={customStyles} >
 						<p className="h4">Edit recipe <i className="fa fa-times" onClick={this.closeModal}></i></p>
-						{/*<button onClick={this.closeModal}>X</button>*/}
 
 						<form id="recipeEditForm">
 							<div className="form-group">
@@ -393,3 +346,12 @@ var MModalEdit = React.createClass({
 		);
 	}
 });
+
+//helper remove spaces between chars/words; used to create ingredient unique keys where the recipe has mult words
+function trimSpaces(str) {
+	let ar = [], resultStr;
+	ar = str.split(' ');
+	resultStr = ar.join('');
+
+	return resultStr;
+}
