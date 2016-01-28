@@ -34,7 +34,12 @@ export default class App extends React.Component {
 					</nav>
 				</div>
 
-				<RecipeSection />
+				<div className="recipeSection">
+					<RecipeList /> {/* data={this.getNames() data={this.state.data} */}
+					<MModalAdd />
+				</div>
+
+				{/*<RecipeSection />*/}
 
 				<div className="row footer">
 					<div className="col-xs-12 col-sm-12">
@@ -60,23 +65,18 @@ const customStyles = {
 	}
 };
 
-var RecipeSection = React.createClass({
-	getNames: function() {
-		return Startup.getRecipes();
-	},
+// var RecipeSection = React.createClass({
+// 	getNames: function() {
+// 		return Startup.getRecipes();
+// 	},
 
-	render: function() {
-		//var accordion = this.state.accordion;
-		return (
-			<div>
-				<RecipeList /> {/* data={this.getNames() data={this.state.data} */}
-				<MModalAdd />
-{/* TODO recipe edit modal */}
-				{/*<MModalEdit />*/}
-			</div>
-		);
-	}
-});
+// 	render: function() {
+// 		//var accordion = this.state.accordion;
+// 		return (
+			
+// 		);
+// 	}
+// });
 
 var RecipeList = React.createClass({
 	setNamesState: function(namesAr) {
@@ -146,15 +146,16 @@ var Recipe = React.createClass({
 	},
 
 	render: function() {
-		let classStr = this.concatName() + ' hidden';
+		let classStr = this.concatName() + ' padding hidden';
 		return (
 			<div className="recipe clear">
 				<p className="h4" onClick={this.toggleIngredients}>{this.props.data}</p>
 				<div className={classStr}>
-					<IngredientsList data={this.props.data}/>
-					<div>
+					<p className="h5">INGREDIENTS</p>
+					{/*<div>*/}
+						<IngredientsList data={this.props.data}/>
 						<Buttons data={this.props.data} />
-					</div>
+					{/*</div>*/}
 				</div>
 			</div>
 		);
@@ -175,17 +176,15 @@ var IngredientsList = React.createClass({
 		// console.log('length ingredientsAr: ' + ingredientsAr.length);
 		var ingredientNodes = ingredientsAr.map(function(ingred) {
 			return (
-				<li className="ingredient">
+				<div className="ingredient">
 					{ingred}
-				</li>
+				</div>
 			);
 		});
 
 		return (
 			<div className="ingredientList">
-				<ul>
-					{ingredientNodes}
-				</ul>
+				{ingredientNodes}
 			</div>
 		);
 	}
@@ -200,8 +199,8 @@ var Buttons = React.createClass({
 
 	render: function() {
 		return (
-			<div >
-				<li className="buttons"><button data={this.props.data} onClick={this.deleteRecipe} >Delete</button></li>
+			<div className="button-section">
+				<li className="buttons"><button className="btn btn-danger" data={this.props.data} onClick={this.deleteRecipe} >Delete</button></li>
 				<li className="buttons"><MModalEdit data={this.props.data}></MModalEdit></li>
 			</div>
 			);
@@ -277,7 +276,7 @@ var MModalAdd = React.createClass({
 		return (
 
 				<div className="clear">
-					<button onClick={this.openModal} >Add Recipe</button>
+					<button className="btn btn-default btn-add" onClick={this.openModal} >Add Recipe</button>
 					<Modal
 						isOpen={this.state.modalIsOpen}
 						onRequestClose={this.closeModal}
@@ -370,7 +369,7 @@ var MModalEdit = React.createClass({
 		return (
 
 				<div>
-					<button onClick={this.openModal}>Edit</button>
+					<button className="btn btn-default" onClick={this.openModal}>Edit</button>
 					<Modal
 						isOpen={this.state.modalIsOpen}
 						onRequestClose={this.closeModal}
