@@ -45,7 +45,7 @@ export default class App extends React.Component {
 					<div className="col-xs-12 col-sm-12">
 						<p className="text-center">Brought to you with <i className="fa fa-heart"></i><br /> 
 							from <a href="http://www.carolchung.com" target="_blank">Tusk Tusk Dev.</a><br />
-							<a href="https://github.com/cch5ng/fcc-leaderboard" target="_blank">(source)</a>
+							<a href="https://github.com/cch5ng/recipe-box" target="_blank">Source</a>
 						</p>
 					</div>
 				</div>
