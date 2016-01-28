@@ -109,6 +109,10 @@ var RecipeList = React.createClass({
 var Recipe = React.createClass({
 	//concatenate names (removing spaces), otherwise the class name used to select a particular
 	//recipe name would break due to spaces
+	getInitialState: function() {
+		return {isOpen: false}
+	},
+
 	concatName: function() {
 		let nameAr = this.props.data.split(' ');
 		let nameStr = nameAr.join('');
@@ -116,11 +120,16 @@ var Recipe = React.createClass({
 	},
 
 	toggleIngredients: function() {
-		var ingredientsBox = $('.'+ this.concatName()).toggleClass('hidden');
+		if (this.state.isOpen) {
+			this.setState({isOpen: false});
+		} else {
+			this.setState({isOpen: true});
+		}
 	},
 
 	render: function() {
-		let classStr = this.concatName() + ' padding hidden';
+		let classStr;
+		(this.state.isOpen) ? classStr = this.concatName() + ' padding' : classStr = this.concatName() + ' padding hidden';
 		return (
 			<div className="recipe clear">
 				<p className="h4" onClick={this.toggleIngredients}>{this.props.data}</p>
