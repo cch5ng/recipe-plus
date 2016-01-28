@@ -10,10 +10,15 @@
 
 ## Status
 
-* TODO: implement edit logic
 * FIX: unique keys for ingredients list items
+* FIX: accordion should keep state (isOpen) dependent on click handler
+* FIX: all buttons are updating the localStorage appropriately but they are not updating the state of the respective component appropriate
+  * Delete button
+  * Edit button
+  * (DONE) Add button
 * FIX: want the main list to refresh (update state for RecipeList) whenever the modal is updated (save, edit, delete)
 * STYLE: make everything look beautiful
+* DONE: implement edit logic
 * DONE: restructure recipe list into an accordion component
 * DONE: implement view logic, create component for viewing recipes list and individual recipe details
 * DONE: implement delete logic
