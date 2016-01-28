@@ -11,6 +11,7 @@
 ## Status
 
 * TODO: implement edit logic
+* FIX: unique keys for ingredients list items
 * FIX: want the main list to refresh (update state for RecipeList) whenever the modal is updated (save, edit, delete)
 * STYLE: make everything look beautiful
 * DONE: restructure recipe list into an accordion component
