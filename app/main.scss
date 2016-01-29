@@ -43,6 +43,15 @@ body {
 	background-color: #e5e5e5;
 }
 
+// react-bootstrap modal
+.modal-container {
+  position: relative;
+}
+
+.modal-container .modal, .modal-container .modal-backdrop {
+  position: absolute;
+}
+
 .center {
 	text-align: center;
 }

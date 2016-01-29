@@ -2,7 +2,9 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Modal from 'react-modal';
+import {Modal} from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
+// import Modal from 'react-modal';
 import '../startup.js';
 
 export default class App extends React.Component {
@@ -10,19 +12,11 @@ export default class App extends React.Component {
 		super();
 	}
 
-	getInitialState() {
-		return (
-			{
-			modalIsOpen: false, 
-			names: []
-			}
-		);
-	}
-
 //functions from MModalAdd
 
 
 	render() {
+
 		return (
 			<div className="container-fluid" >
 				<div className="row">
@@ -33,11 +27,7 @@ export default class App extends React.Component {
 					</nav>
 				</div>
 
-				<div className="recipeSection">
-					<RecipeList />
-				{/* modal for adding recipes */}
-					<MModalAdd />
-				</div>
+				<RecipeSection />
 
 				<div className="row footer">
 					<div className="col-xs-12 col-sm-12">
@@ -64,9 +54,48 @@ const customStyles = {
 	}
 };
 
+var RecipeSection = React.createClass({
+	// getInitialState: function() {
+	// 	return (
+	// 		{names: this.getNames()}
+	// 	);
+	// },
+
+	render: function() {
+
+		return (
+			<div className="recipeSection">
+				<RecipeList />
+			{/* modal for adding recipes */}
+			{/* 	<MModalAdd /> */}
+			</div>
+		);
+	}
+});
+
 var RecipeList = React.createClass({
 	getInitialState: function() {
 		return {names : []};
+	},
+
+	getNamesAr: function() {
+		let namesStr = '';
+		let namesCount;
+		let namesAr = [];
+		namesCount = localStorage.length;
+		console.log('namesCount: ' + namesCount);
+		for (let i = 0; i < namesCount; i++) {
+			//(namesCount - 1) prevents extra empty list item at the bottom
+			if (i < namesCount - 1) {
+				namesStr += localStorage.key(i) + ',';
+			} else {
+				namesStr += localStorage.key(i);
+			}
+		}
+		console.log('namesStr: ' + namesStr);
+		namesAr = namesStr.split(',');
+		return namesAr;
+		//this.setState({names: namesStr});
 	},
 
 	getNames: function() {
@@ -102,7 +131,51 @@ var RecipeList = React.createClass({
 		this.setState({names: namesAr});
 	},
 
+	saveRecipe: function(event) {
+		event.preventDefault();
+
+//parsing the ingredients, cleaning up the format so it will display cleanly later on
+		// console.log('clicked save');
+		var name = document.getElementById('recipeName').value;
+		// console.log('name: ' + name);
+		var ingredientsStr = document.getElementById('recipeIngredients').value;
+		// console.log('ingredientsStr: ' + ingredientsStr);
+		var ingredientsAr = ingredientsStr.split(',');
+	//stores final array of ingredients strings, trimmed
+		var ingredientsTrim = [];
+		// console.log('ingredientsAr: ' + ingredientsAr);
+		// console.log('length ingredientsAr: ' + ingredientsAr.length);
+		ingredientsAr.forEach(function(item) {
+			// console.log('item: ' + item);
+			var itemCopy = item.slice(0).trim();
+			ingredientsTrim.push(itemCopy);
+		});
+		//making the ingredients list in localStorage comma delimited but no space
+		var ingredientsStrClean = ingredientsTrim.join(',');
+		console.log('ingredientsStrClean: ' + ingredientsStrClean);
+
+//updating localStorage
+		localStorage.setItem(name, ingredientsStrClean);
+
+//TODO here should also reset the session data var so all latest recipes display
+		let namesAr = [];
+		namesAr = this.getNames();
+		namesAr.push(name);
+		this.setState({names: namesAr});
+
+		let form = document.getElementById('recipeForm');
+		form.reset();
+	},
+
 	render: function() {
+		var me = this;
+		var setName = function(name) {
+			let origNames;
+			origNames = this.getNamesAr();
+			let newNames = origNames.join(name);
+			me.setState({names: newNames});
+		};
+
 		let namesAr = [];
 		//console.log('this.state.names: ' + this.state.names);
 		namesAr = this.state.names.split(',');
@@ -121,6 +194,49 @@ var RecipeList = React.createClass({
 				<ul>
 				{recipeNodes}
 				</ul>
+				<Button
+					bsStyle="default"
+					onClick={() => this.setState({ show: true})}
+				>
+					Add Recipe
+				</Button>
+
+				<div className="modal-container">
+					<Modal
+						show={this.state.show}
+						onHide={close}
+						container={this}
+						aria-labelledby="contained-modal-title"
+					>
+						<Modal.Header>
+							<Modal.Title>Add Recipe</Modal.Title>
+						</Modal.Header>
+
+						<Modal.Body>
+							<form id="recipeForm">
+							<div className="form-group">
+								<label htmlFor="recipe-name">Name</label>
+								<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" />
+							</div>
+							<div className="form-group">
+								<label htmlFor="recipe-ingredients">Ingredients</label>
+								<input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" placeholder="enter ingredients separated by commas" size="50" />
+							</div>
+					</form>
+						</Modal.Body>
+
+						<Modal.Footer>
+							<Button type="submit" onClick={this.saveRecipe} bsStyle="primary" >Add Recipe</Button>
+							<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>
+
+							{/*<Button onClick={() => this.setState({show: false})}>Close</Button>
+							<Button bsStyle="primary">Save changes</Button>*/}
+						</Modal.Footer>
+
+					</Modal>
+
+					{/*<MModalAdd />*/}
+				</div>
 			</div>
 		);
 	}
@@ -259,7 +375,7 @@ var MModalAdd = React.createClass({
 
 	render: function() {
 		return (
-			<div className="clear">
+			<div className="clear" setName={setName}>
 				<button className="btn btn-default btn-add" onClick={this.openModal} >Add Recipe</button>
 				<Modal
 					isOpen={this.state.modalIsOpen}
@@ -276,7 +392,7 @@ var MModalAdd = React.createClass({
 							<label htmlFor="recipe-ingredients">Ingredients</label>
 							<input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" placeholder="enter ingredients separated by commas" size="50" />
 						</div>
-						<button type="submit" onClick={this.saveRecipe} className="btn btn-primary">Add Recipe</button> <button className="btn btn-default" onClick={this.closeModal}>Close</button>
+						<button type="submit" onClick={this.saveRecipe} className="btn btn-primary" >Add Recipe</button> <button className="btn btn-default" onClick={this.closeModal}>Close</button>
 					</form>
 				</Modal>
 			</div>
