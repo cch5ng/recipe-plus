@@ -11,6 +11,7 @@
 ## Status
 
 * FIX: delete button, how to affect the parent, RecipeList state
+	still not clear how to push up recipe delete results to recipelist state (names)
 	maybe I can merge up Recipe into RecipeList?
 * FIX: all buttons are updating the localStorage appropriately but they are not updating the state of the respective component appropriate
   * Delete button (not sure how to go from recipe to recipeList)
