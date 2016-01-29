@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Modal} from 'react-bootstrap';
 import {Button} from 'react-bootstrap';
+import {Input} from 'react-bootstrap';
 // import Modal from 'react-modal';
 import '../startup.js';
 
@@ -54,28 +55,9 @@ const customStyles = {
 	}
 };
 
-// var RecipeSection = React.createClass({
-// 	// getInitialState: function() {
-// 	// 	return (
-// 	// 		{names: this.getNames()}
-// 	// 	);
-// 	// },
-
-// 	render: function() {
-
-// 		return (
-// 			<div className="recipeSection">
-// 				<RecipeList />
-// 			{/* modal for adding recipes */}
-// 			{/* 	<MModalAdd /> */}
-// 			</div>
-// 		);
-// 	}
-// });
-
 var RecipeList = React.createClass({
 	getInitialState: function() {
-		return {names : []};
+		return {names : [], nameValid: 'success'};
 	},
 
 	getNamesAr: function() {
@@ -102,7 +84,7 @@ var RecipeList = React.createClass({
 		let namesStr = '';
 		let namesCount;
 		namesCount = localStorage.length;
-		console.log('namesCount: ' + namesCount);
+		//console.log('namesCount: ' + namesCount);
 		for (let i = 0; i < namesCount; i++) {
 			//(namesCount - 1) prevents extra empty list item at the bottom
 			if (i < namesCount - 1) {
@@ -132,39 +114,52 @@ var RecipeList = React.createClass({
 	},
 
 	saveRecipe: function(event) {
-		event.preventDefault();
+		if (this.state.nameValid === 'success') {
+			event.preventDefault();
 
-//parsing the ingredients, cleaning up the format so it will display cleanly later on
-		// console.log('clicked save');
-		var name = document.getElementById('recipeName').value;
-		// console.log('name: ' + name);
-		var ingredientsStr = document.getElementById('recipeIngredients').value;
-		// console.log('ingredientsStr: ' + ingredientsStr);
-		var ingredientsAr = ingredientsStr.split(',');
-	//stores final array of ingredients strings, trimmed
-		var ingredientsTrim = [];
-		// console.log('ingredientsAr: ' + ingredientsAr);
-		// console.log('length ingredientsAr: ' + ingredientsAr.length);
-		ingredientsAr.forEach(function(item) {
-			// console.log('item: ' + item);
-			var itemCopy = item.slice(0).trim();
-			ingredientsTrim.push(itemCopy);
-		});
-		//making the ingredients list in localStorage comma delimited but no space
-		var ingredientsStrClean = ingredientsTrim.join(',');
-		console.log('ingredientsStrClean: ' + ingredientsStrClean);
+	//parsing the ingredients, cleaning up the format so it will display cleanly later on
+			// console.log('clicked save');
+			var name = document.getElementById('recipeName').value;
+			// console.log('name: ' + name);
+			var ingredientsStr = document.getElementById('recipeIngredients').value;
+			// console.log('ingredientsStr: ' + ingredientsStr);
+			var ingredientsAr = ingredientsStr.split(',');
+		//stores final array of ingredients strings, trimmed
+			var ingredientsTrim = [];
+			// console.log('ingredientsAr: ' + ingredientsAr);
+			// console.log('length ingredientsAr: ' + ingredientsAr.length);
+			ingredientsAr.forEach(function(item) {
+				// console.log('item: ' + item);
+				var itemCopy = item.slice(0).trim();
+				ingredientsTrim.push(itemCopy);
+			});
+			//making the ingredients list in localStorage comma delimited but no space
+			var ingredientsStrClean = ingredientsTrim.join(',');
+			console.log('ingredientsStrClean: ' + ingredientsStrClean);
 
-//updating localStorage
-		localStorage.setItem(name, ingredientsStrClean);
+	//updating localStorage
+			localStorage.setItem(name, ingredientsStrClean);
 
-//TODO here should also reset the session data var so all latest recipes display
-		let namesAr = [];
-		namesAr = this.getNames();
-		namesAr.push(name);
-		this.setState({names: namesAr});
+	//TODO here should also reset the session data var so all latest recipes display
+			let namesAr = [];
+			namesAr = this.getNamesAr();
+			namesAr.push(name);
+			this.setState({names: namesAr});
 
-		let form = document.getElementById('recipeForm');
-		form.reset();
+			let form = document.getElementById('recipeForm');
+			form.reset();
+		}
+	},
+
+	validationState: function(event) {
+		let matchCount;
+		let curName = event.target.value;
+//		let curName = document.getElementById('recipeName');
+		if (localStorage.getItem(curName)) {
+			this.setState({nameValid: 'error'});
+		} else {
+			this.setState({nameValid: 'success'});
+		}
 	},
 
 	render: function() {
@@ -172,16 +167,18 @@ var RecipeList = React.createClass({
 		var setName = function(name) {
 			let origNames;
 			origNames = this.getNamesAr();
-			let newNames = origNames.join(name);
+			console.log('origNames: ' + origNames);
+			let newNames = origNames.concat(name);
 			me.setState({names: newNames});
 		};
 
-		let namesAr = [];
+		let namesAr2 = [];
 		//console.log('this.state.names: ' + this.state.names);
-		namesAr = this.state.names.split(',');
+//ERROR
+		namesAr2 = this.state.names.split(',');
 		//console.log('namesAr: ' + namesAr);
 
-		var recipeNodes = namesAr.map(function(recipe, i) {
+		var recipeNodes = namesAr2.map(function(recipe, i) {
 			return (
 				<Recipe key={i} data={recipe}>
 					{recipe}
@@ -215,8 +212,18 @@ var RecipeList = React.createClass({
 						<Modal.Body>
 							<form id="recipeForm">
 								<div className="form-group">
-									<label htmlFor="recipe-name">Name</label>
-									<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" />
+									{/*<label htmlFor="recipe-name">Name</label>*/}
+									<Input type="text" 
+										label="Name" 
+										groupClassName="group-class"
+										labelClassName="label-class" 
+										id="recipeName" 
+										name="recipeName" 
+										size="50" 
+										help="Name must be unique or original ingredients will be lost." 
+										bsStyle={this.state.nameValid} hasFeedback
+										onChange={this.validationState}
+									/>
 								</div>
 								<div className="form-group">
 									<label htmlFor="recipe-ingredients">Ingredients</label>
