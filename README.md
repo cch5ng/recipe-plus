@@ -10,13 +10,15 @@
 
 ## Status
 
+* FIX: delete button, how to affect the parent, RecipeList state
+	maybe I can merge up Recipe into RecipeList?
 * FIX: all buttons are updating the localStorage appropriately but they are not updating the state of the respective component appropriate
   * Delete button (not sure how to go from recipe to recipeList)
   * (DONE) Add button
   * (DONE) Edit button
   * DONE: want the main list to refresh (update state for RecipeList) whenever the modal is updated (save, edit, delete)
-* FIX: when user tries to save new recipe, there should be validation to check that name is a unique key in localStorage, otherwise suggest a different one (otherwise the old value would get overwritten even if the user doesn't intend)
 * STYLE: make everything look beautiful
+* DONE: when user tries to save new recipe, there should be validation to check that name is a unique key in localStorage, otherwise suggest a different one (otherwise the old value would get overwritten even if the user doesn't intend)
 * DONE: accordion should keep state (isOpen) dependent on click handler
 * DONE: unique keys for ingredients list items
 * DONE: implement edit logic

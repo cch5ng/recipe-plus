@@ -125,6 +125,22 @@ var RecipeList = React.createClass({
 		}
 	},
 
+	handleDelete: function(name) {
+		let namesStr;
+		namesStr = this.state.names;
+		let namesAr = namesStr.split(',');
+		let newNamesAr = [];
+		let newNamesStr;
+
+		namesAr.forEach(function(mname) {
+			if (mname !== name) {
+				newNamesAr.push(mname);
+			}
+		});
+		console.log('newNamesAr: ' + newNamesAr);
+		this.setState({names: newNamesStr});
+	},
+
 	render: function() {
 		// var me = this;
 		// var setName = function() {
@@ -144,8 +160,9 @@ var RecipeList = React.createClass({
 		//console.log('namesAr: ' + namesAr);
 
 		var recipeNodes = namesAr2.map(function(recipe, i) {
+			let that = this;
 			return (
-				<Recipe key={i} data={recipe}>
+				<Recipe key={i} data={recipe}  > {/* onDelete={RecipeList.handleDelete() }*/}
 					{recipe}
 				</Recipe>
 			);
@@ -245,7 +262,10 @@ var Recipe = React.createClass({
 	deleteRecipe: function() {
 		console.log('deleting recipe: ' + this.state.name);
 		localStorage.removeItem(this.state.name);
-		this.state.name = null;
+		this.setState({name: null});
+		//this.props.onDelete(this.state.name);
+		//this.state.name = null;
+
 //TODO this event should also result in updating the RecipeList view
 	},
 
