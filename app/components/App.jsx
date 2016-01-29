@@ -39,18 +39,6 @@ export default class App extends React.Component {
 	}
 }
 
-//used by MModals
-const customStyles = {
-	content : {
-		top                   : '50%',
-		left                  : '50%',
-		right                 : 'auto',
-		bottom                : 'auto',
-		marginRight           : '-50%',
-		transform             : 'translate(-50%, -50%)'
-	}
-};
-
 var RecipeList = React.createClass({
 	getInitialState: function() {
 		return {names : '', nameValid: 'success'};
@@ -85,25 +73,15 @@ var RecipeList = React.createClass({
 		this.render();
 	},
 
-//NOTE: when I enable this function, it just seems to run constantly not sure if b/c of running dev test server
-	// componentDidUpdate: function() {
-	// 	console.log('how to trigger this');
-	// 	this.getNames();
-	// 	this.render();
-	// },
-
-	// setNamesState: function(namesAr) {
-	// 	this.setState({names: namesAr});
-	// },
-
 	saveRecipe: function(event) {
 		if (this.state.nameValid === 'success') {
 			event.preventDefault();
 
 	//parsing the ingredients, cleaning up the format so it will display cleanly later on
 			// console.log('clicked save');
-			var name = document.getElementById('recipeName').value;
-			// console.log('name: ' + name);
+			let existingNames = this.getNames();
+			let name = document.getElementById('recipeName').value;
+			console.log('name: ' + name);
 			var ingredientsStr = document.getElementById('recipeIngredients').value;
 			// console.log('ingredientsStr: ' + ingredientsStr);
 			var ingredientsAr = ingredientsStr.split(',');
@@ -122,11 +100,12 @@ var RecipeList = React.createClass({
 
 	//updating localStorage
 			localStorage.setItem(name, ingredientsStrClean);
+			console.log('names: ' + this.getNames());
 
 	//TODO here should also reset the session data var so all latest recipes display
 //TEST this is duplicating newest item in recipe list
 			let namesStr;
-			namesStr = this.getNames(); // + ',' + name
+			namesStr = existingNames + ',' + name;
 			console.log('save namesStr: ' + namesStr);
 			this.setState({names: namesStr});
 
@@ -147,14 +126,14 @@ var RecipeList = React.createClass({
 	},
 
 	render: function() {
-		var me = this;
-		var setName = function(name) {
-			let origNames;
-			origNames = this.getNames();
-			let newNames = origNames + ',' + name;
-			//origNames.join(name);
-			me.setState({names: newNames});
-		};
+		// var me = this;
+		// var setName = function() {
+		// 	let origNames;
+		// 	origNames = this.getNames();
+		// 	let newNames = origNames + ',' + document.getElementById('recipeName');
+		// 	//origNames.join(name);
+		// 	me.setState({names: newNames});
+		// };
 
 		let namesAr2 = [];
 		if (this.state.names) {
@@ -218,7 +197,10 @@ var RecipeList = React.createClass({
 						</Modal.Body>
 
 						<Modal.Footer>
-							<Button type="submit" onClick={this.saveRecipe} bsStyle="primary" setName={setName} >Add Recipe</Button>
+{/*ERROR if name is alphbetically after the last item in existing list, it will display ok
+but if alphabetically before last item in list, then a dupe of the last item in existing list will be displayed
+until page refresh */}
+							<Button type="submit" onClick={this.saveRecipe} bsStyle="primary" >Add Recipe</Button>
 							<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>
 						</Modal.Footer>
 					</Modal>
