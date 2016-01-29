@@ -13,11 +13,7 @@ export default class App extends React.Component {
 		super();
 	}
 
-//functions from MModalAdd
-
-
 	render() {
-
 		return (
 			<div className="container-fluid" >
 				<div className="row">
@@ -57,27 +53,7 @@ const customStyles = {
 
 var RecipeList = React.createClass({
 	getInitialState: function() {
-		return {names : [], nameValid: 'success'};
-	},
-
-	getNamesAr: function() {
-		let namesStr = '';
-		let namesCount;
-		let namesAr = [];
-		namesCount = localStorage.length;
-		console.log('namesCount: ' + namesCount);
-		for (let i = 0; i < namesCount; i++) {
-			//(namesCount - 1) prevents extra empty list item at the bottom
-			if (i < namesCount - 1) {
-				namesStr += localStorage.key(i) + ',';
-			} else {
-				namesStr += localStorage.key(i);
-			}
-		}
-		console.log('namesStr: ' + namesStr);
-		namesAr = namesStr.split(',');
-		return namesAr;
-		//this.setState({names: namesStr});
+		return {names : '', nameValid: 'success'};
 	},
 
 	getNames: function() {
@@ -94,11 +70,18 @@ var RecipeList = React.createClass({
 			}
 		}
 		console.log('namesStr: ' + namesStr);
-		this.setState({names: namesStr});
+		return namesStr;
+//		this.setState({names: namesStr});
+	},
+
+	getName: function() {
+		let curName = document.getElementById('recipeName');
+		return curName;
 	},
 
 	componentDidMount: function() {
-		this.getNames();
+		let namesStr = this.getNames();
+		this.setState({names: namesStr});
 		this.render();
 	},
 
@@ -109,9 +92,9 @@ var RecipeList = React.createClass({
 	// 	this.render();
 	// },
 
-	setNamesState: function(namesAr) {
-		this.setState({names: namesAr});
-	},
+	// setNamesState: function(namesAr) {
+	// 	this.setState({names: namesAr});
+	// },
 
 	saveRecipe: function(event) {
 		if (this.state.nameValid === 'success') {
@@ -141,10 +124,11 @@ var RecipeList = React.createClass({
 			localStorage.setItem(name, ingredientsStrClean);
 
 	//TODO here should also reset the session data var so all latest recipes display
-			let namesAr = [];
-			namesAr = this.getNamesAr();
-			namesAr.push(name);
-			this.setState({names: namesAr});
+//TEST this is duplicating newest item in recipe list
+			let namesStr;
+			namesStr = this.getNames(); // + ',' + name
+			console.log('save namesStr: ' + namesStr);
+			this.setState({names: namesStr});
 
 			let form = document.getElementById('recipeForm');
 			form.reset();
@@ -166,16 +150,18 @@ var RecipeList = React.createClass({
 		var me = this;
 		var setName = function(name) {
 			let origNames;
-			origNames = this.getNamesAr();
-			console.log('origNames: ' + origNames);
-			let newNames = origNames.concat(name);
+			origNames = this.getNames();
+			let newNames = origNames + ',' + name;
+			//origNames.join(name);
 			me.setState({names: newNames});
 		};
 
 		let namesAr2 = [];
-		//console.log('this.state.names: ' + this.state.names);
-//ERROR
-		namesAr2 = this.state.names.split(',');
+		if (this.state.names) {
+			console.log('this.state.names: ' + this.state.names);
+	//ERROR
+			namesAr2 = this.state.names.split(',');
+		}
 		//console.log('namesAr: ' + namesAr);
 
 		var recipeNodes = namesAr2.map(function(recipe, i) {
@@ -193,8 +179,8 @@ var RecipeList = React.createClass({
 				</ul>
 				<Button
 					bsStyle="default"
-					onClick={() => this.setState({ show: true})}
-				>
+					onClick={() => this.setState({ show: true})}>
+
 					Add Recipe
 				</Button>
 
@@ -203,8 +189,8 @@ var RecipeList = React.createClass({
 						show={this.state.show}
 						onHide={close}
 						container={this}
-						aria-labelledby="contained-modal-title"
-					>
+						aria-labelledby="contained-modal-title">
+
 						<Modal.Header>
 							<Modal.Title>Add Recipe</Modal.Title>
 						</Modal.Header>
@@ -212,15 +198,14 @@ var RecipeList = React.createClass({
 						<Modal.Body>
 							<form id="recipeForm">
 								<div className="form-group">
-									{/*<label htmlFor="recipe-name">Name</label>*/}
 									<Input type="text" 
 										label="Name" 
 										groupClassName="group-class"
-										labelClassName="label-class" 
-										id="recipeName" 
-										name="recipeName" 
-										size="50" 
-										help="Name must be unique or original ingredients will be lost." 
+										labelClassName="label-class"
+										id="recipeName"
+										name="recipeName"
+										size="50"
+										help="Name must be unique or original ingredients will be lost."
 										bsStyle={this.state.nameValid} hasFeedback
 										onChange={this.validationState}
 									/>
@@ -233,7 +218,7 @@ var RecipeList = React.createClass({
 						</Modal.Body>
 
 						<Modal.Footer>
-							<Button type="submit" onClick={this.saveRecipe} bsStyle="primary" >Add Recipe</Button>
+							<Button type="submit" onClick={this.saveRecipe} bsStyle="primary" setName={setName} >Add Recipe</Button>
 							<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>
 						</Modal.Footer>
 					</Modal>
@@ -279,9 +264,7 @@ var Recipe = React.createClass({
 		console.log('deleting recipe: ' + this.state.name);
 		localStorage.removeItem(this.state.name);
 		this.state.name = null;
-		//this.props.data = null;
 //TODO this event should also result in updating the RecipeList view
-//
 	},
 
 	editRecipe: function(event) {
@@ -352,8 +335,8 @@ var Recipe = React.createClass({
 								show={this.state.show}
 								onHide={close}
 								container={this}
-								aria-labelledby="contained-modal-title"
-							>
+								aria-labelledby="contained-modal-title">
+
 								<Modal.Header>
 									<Modal.Title>Edit Recipe</Modal.Title>
 								</Modal.Header>
@@ -374,98 +357,12 @@ var Recipe = React.createClass({
 								<Modal.Footer>
 									<Button type="submit" onClick={this.editRecipe} bsStyle="primary">Edit Recipe</Button>
 									<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>
-
-									{/*<Button type="submit" onClick={this.saveRecipe} bsStyle="primary" >Add Recipe</Button>
-									<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>*/}
 								</Modal.Footer>
 							</Modal>
 						</div>
-
-
-
-						{/*<li className="buttons"><MModalEdit data={this.state.name}></MModalEdit></li>*/}
 					</div>
 				</div>
 			</div>
-		);
-	}
-});
-
-var MModalEdit = React.createClass({
-
-	getInitialState: function() {
-		return { modalIsOpen: false, names: [], ingredients: this.getIngredients()};
-	},
-
-	openModal: function() {
-		this.setState({modalIsOpen: true});
-	},
-
-	closeModal: function(event) {
-		event.preventDefault();
-		this.setState({modalIsOpen: false});
-//TODO hardcoded a browser refresh to get the latest list of recipes but I don't think this is the best way
-//TODO how to get the recipe list to update when the modal is closed
-	},
-
-	getIngredients: function() {
-		let ingredientsStr = localStorage.getItem(this.props.data);
-		//console.log('ingredientsStr: ' + ingredientsStr);
-		return ingredientsStr;
-	},
-
-	updateIngredientsField: function(event) {
-		this.setState({ingredients: event.target.value});
-		//console.log('this.state.ingredients: ' + this.state.ingredients);
-	},
-
-	editRecipe: function(event) {
-		event.preventDefault();
-
-	//parsing the ingredients, cleaning up the format so it will display cleanly later on
-		var name = this.props.data
-		//console.log('name: ' + name);
-		var ingredientsStr = this.state.ingredients;
-		var ingredientsAr = ingredientsStr.split(',');
-		var ingredientsTrim = [];
-		ingredientsAr.forEach(function(item) {
-			var itemCopy = item.slice(0).trim();
-			ingredientsTrim.push(itemCopy);
-		});
-		var ingredientsStrClean = ingredientsTrim.join(',');
-		//console.log('ingredientsStrClean: ' + ingredientsStrClean);
-
-	//updating localStorage
-		localStorage.setItem(name, ingredientsStrClean);
-
-		let form = document.getElementById('recipeEditForm');
-		form.reset();
-	},
-
-	render: function() {
-		return (
-
-				<div>
-					<button className="btn btn-default" onClick={this.openModal}>Edit</button>
-					<Modal
-						isOpen={this.state.modalIsOpen}
-						onRequestClose={this.closeModal}
-						style={customStyles} >
-						<p className="h4">Edit recipe <i className="fa fa-times" onClick={this.closeModal}></i></p>
-
-						<form id="recipeEditForm">
-							<div className="form-group">
-								<label htmlFor="recipeName">Name</label>
-								<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" value={this.props.data} readOnly />
-							</div>
-							<div className="form-group">
-								<label htmlFor="recipeIngredientsEdit">Ingredients</label>
-								<input type="text" className="form-control" id="recipeIngredientsEdit" name="recipeIngredientsEdit" value={this.state.ingredients} onChange={this.updateIngredientsField} size="50" />
-							</div>
-							<button type="submit" onClick={this.editRecipe} className="btn btn-primary">Edit Recipe</button> <button className="btn btn-default" onClick={this.closeModal}>Close</button>
-						</form>
-					</Modal>
-				</div>
 		);
 	}
 });
