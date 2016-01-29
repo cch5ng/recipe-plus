@@ -5,7 +5,6 @@ import ReactDOM from 'react-dom';
 import {Modal} from 'react-bootstrap';
 import {Button} from 'react-bootstrap';
 import {Input} from 'react-bootstrap';
-// import Modal from 'react-modal';
 import '../startup.js';
 
 export default class App extends React.Component {
@@ -59,7 +58,6 @@ var RecipeList = React.createClass({
 		}
 		console.log('namesStr: ' + namesStr);
 		return namesStr;
-//		this.setState({names: namesStr});
 	},
 
 	getName: function() {
@@ -96,17 +94,15 @@ var RecipeList = React.createClass({
 			});
 			//making the ingredients list in localStorage comma delimited but no space
 			var ingredientsStrClean = ingredientsTrim.join(',');
-			console.log('ingredientsStrClean: ' + ingredientsStrClean);
+			//console.log('ingredientsStrClean: ' + ingredientsStrClean);
 
 	//updating localStorage
 			localStorage.setItem(name, ingredientsStrClean);
-			console.log('names: ' + this.getNames());
+			//console.log('names: ' + this.getNames());
 
-	//TODO here should also reset the session data var so all latest recipes display
-//TEST this is duplicating newest item in recipe list
 			let namesStr;
 			namesStr = existingNames + ',' + name;
-			console.log('save namesStr: ' + namesStr);
+			//console.log('save namesStr: ' + namesStr);
 			this.setState({names: namesStr});
 
 			let form = document.getElementById('recipeForm');
@@ -114,10 +110,10 @@ var RecipeList = React.createClass({
 		}
 	},
 
+	//perform validation to ensure that name field is unique (key in localStorage)
 	validationState: function(event) {
 		let matchCount;
 		let curName = event.target.value;
-//		let curName = document.getElementById('recipeName');
 		if (localStorage.getItem(curName)) {
 			this.setState({nameValid: 'error'});
 		} else {
@@ -137,32 +133,20 @@ var RecipeList = React.createClass({
 				newNamesAr.push(mname);
 			}
 		});
-		console.log('newNamesAr: ' + newNamesAr);
+		//console.log('newNamesAr: ' + newNamesAr);
 		this.setState({names: newNamesStr});
 	},
 
 	render: function() {
-		// var me = this;
-		// var setName = function() {
-		// 	let origNames;
-		// 	origNames = this.getNames();
-		// 	let newNames = origNames + ',' + document.getElementById('recipeName');
-		// 	//origNames.join(name);
-		// 	me.setState({names: newNames});
-		// };
-
 		let namesAr2 = [];
 		if (this.state.names) {
-			console.log('this.state.names: ' + this.state.names);
-	//ERROR
+			//console.log('this.state.names: ' + this.state.names);
 			namesAr2 = this.state.names.split(',');
 		}
-		//console.log('namesAr: ' + namesAr);
 
 		var recipeNodes = namesAr2.map(function(recipe, i) {
-			let that = this;
 			return (
-				<Recipe key={i} data={recipe}  > {/* onDelete={RecipeList.handleDelete() }*/}
+				<Recipe key={i} data={recipe}  >
 					{recipe}
 				</Recipe>
 			);
@@ -171,13 +155,12 @@ var RecipeList = React.createClass({
 		return (
 			<div className="recipeList">
 				<ul>
-				{recipeNodes}
+					{recipeNodes}
 				</ul>
 				<Button
 					bsStyle="default"
 					onClick={() => this.setState({ show: true})}>
-
-					Add Recipe
+						Add Recipe
 				</Button>
 
 				<div className="modal-container">
@@ -214,9 +197,6 @@ var RecipeList = React.createClass({
 						</Modal.Body>
 
 						<Modal.Footer>
-{/*ERROR if name is alphbetically after the last item in existing list, it will display ok
-but if alphabetically before last item in list, then a dupe of the last item in existing list will be displayed
-until page refresh */}
 							<Button type="submit" onClick={this.saveRecipe} bsStyle="primary" >Add Recipe</Button>
 							<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>
 						</Modal.Footer>
@@ -228,11 +208,13 @@ until page refresh */}
 });
 
 var Recipe = React.createClass({
-	//concatenate names (removing spaces), otherwise the class name used to select a particular
-	//recipe name would break due to spaces
 	getInitialState: function() {
 		return {isOpen: false, name: this.props.data, ingredients: this.getIngredients()}
 	},
+
+	// componentDidMount: function() {
+	// 	this.render();
+	// },
 
 	getIngredients: function() {
 		let ingredientsStr = localStorage.getItem(this.props.data);
@@ -245,6 +227,8 @@ var Recipe = React.createClass({
 		//console.log('this.state.ingredients: ' + this.state.ingredients);
 	},
 
+	//concatenate names (removing spaces), otherwise the class name used to select a particular
+	//recipe name would break due to spaces
 	concatName: function() {
 		let nameAr = this.props.data.split(' ');
 		let nameStr = nameAr.join('');
@@ -263,8 +247,9 @@ var Recipe = React.createClass({
 		console.log('deleting recipe: ' + this.state.name);
 		localStorage.removeItem(this.state.name);
 		this.setState({name: null});
-		//this.props.onDelete(this.state.name);
-		//this.state.name = null;
+		//this is a hack to get delete to work properly, should actually update the RecipeList state, names
+		//not sure how to get into it w/o flux?
+		document.location.reload(true);
 
 //TODO this event should also result in updating the RecipeList view
 	},
@@ -294,9 +279,11 @@ var Recipe = React.createClass({
 	},
 
 	render: function() {
-		let classStr;
+		let classStr, classStrOutter;
 		(this.state.isOpen) ? classStr = this.concatName() + ' padding' : classStr = this.concatName() + ' padding hidden';
-		let classStrOutter;
+		//let classStrOutter = 'recipe clear';
+//TO FIX - temp fix for removing deleted recipe from view but it is a hack (only hiding it with css and not
+//truly updating the parent state, names in RecipeList)
 		(this.state.name) ? classStrOutter = 'recipe clear' : classStrOutter = 'recipe clear hidden';
 		let ingredientsAr = [];
 		let ingredientsStr;
@@ -319,7 +306,7 @@ var Recipe = React.createClass({
 		});
 
 		return (
-			<div className={classStrOutter}>
+			<div className={classStrOutter} >
 				<p className="h4" onClick={this.toggleIngredients}>{this.state.name}</p>
 				<div className={classStr}>
 					<p className="h5">INGREDIENTS</p>

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Modal from 'react-modal';
 import App from './components/App.jsx';
 //import './fixed-data-table.css';
 
