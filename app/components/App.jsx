@@ -10,6 +10,18 @@ export default class App extends React.Component {
 		super();
 	}
 
+	getInitialState() {
+		return (
+			{
+			modalIsOpen: false, 
+			names: []
+			}
+		);
+	}
+
+//functions from MModalAdd
+
+
 	render() {
 		return (
 			<div className="container-fluid" >
@@ -23,6 +35,7 @@ export default class App extends React.Component {
 
 				<div className="recipeSection">
 					<RecipeList />
+				{/* modal for adding recipes */}
 					<MModalAdd />
 				</div>
 
@@ -52,8 +65,8 @@ const customStyles = {
 };
 
 var RecipeList = React.createClass({
-	setNamesState: function(namesAr) {
-		this.setState({names: namesAr});
+	getInitialState: function() {
+		return {names : []};
 	},
 
 	getNames: function() {
@@ -73,13 +86,20 @@ var RecipeList = React.createClass({
 		this.setState({names: namesStr});
 	},
 
-	getInitialState: function() {
-		return {names : []};
-	},
-
 	componentDidMount: function() {
 		this.getNames();
 		this.render();
+	},
+
+//NOTE: when I enable this function, it just seems to run constantly not sure if b/c of running dev test server
+	// componentDidUpdate: function() {
+	// 	console.log('how to trigger this');
+	// 	this.getNames();
+	// 	this.render();
+	// },
+
+	setNamesState: function(namesAr) {
+		this.setState({names: namesAr});
 	},
 
 	render: function() {
@@ -88,9 +108,9 @@ var RecipeList = React.createClass({
 		namesAr = this.state.names.split(',');
 		//console.log('namesAr: ' + namesAr);
 
-		var recipeNodes = namesAr.map(function(recipe) {
+		var recipeNodes = namesAr.map(function(recipe, i) {
 			return (
-				<Recipe key={recipe} data={recipe}>
+				<Recipe key={i} data={recipe}>
 					{recipe}
 				</Recipe>
 			);
@@ -110,7 +130,7 @@ var Recipe = React.createClass({
 	//concatenate names (removing spaces), otherwise the class name used to select a particular
 	//recipe name would break due to spaces
 	getInitialState: function() {
-		return {isOpen: false}
+		return {isOpen: false, name: this.props.data}
 	},
 
 	concatName: function() {
@@ -127,71 +147,61 @@ var Recipe = React.createClass({
 		}
 	},
 
+	deleteRecipe: function() {
+		console.log('deleting recipe: ' + this.state.name);
+		localStorage.removeItem(this.state.name);
+		this.state.name = null;
+		//this.props.data = null;
+//TODO this event should also result in updating the RecipeList view
+//
+	},
+
 	render: function() {
 		let classStr;
 		(this.state.isOpen) ? classStr = this.concatName() + ' padding' : classStr = this.concatName() + ' padding hidden';
-		return (
-			<div className="recipe clear">
-				<p className="h4" onClick={this.toggleIngredients}>{this.props.data}</p>
-				<div className={classStr}>
-					<p className="h5">INGREDIENTS</p>
-					<IngredientsList data={this.props.data}/>
-					<Buttons data={this.props.data} />
-				</div>
-			</div>
-		);
-	}
-});
-
-var IngredientsList = React.createClass({
-	render: function() {
+		let classStrOutter;
+		(this.state.name) ? classStrOutter = 'recipe clear' : classStrOutter = 'recipe clear hidden';
 		let ingredientsAr = [];
 		let ingredientsStr;
-		let nameStr = this.props.data;
+		let nameStr = this.state.name;
 		//console.log('this.props.data: ' + this.props.data);
-		ingredientsStr = localStorage.getItem(this.props.data);
+		ingredientsStr = localStorage.getItem(this.state.name);
 		//console.log('ingredientsStr: ' + ingredientsStr);
 		if (ingredientsStr) {
 //on data input to localStorage, spaces are trimmed so list should be strictly comma-delimited
 			ingredientsAr = ingredientsStr.split(',');
 		}
 		// console.log('length ingredientsAr: ' + ingredientsAr.length);
-		var ingredientNodes = ingredientsAr.map(function(ingred) {
+		var ingredientNodes = ingredientsAr.map(function(ingred, i) {
 			let keyStr = trimSpaces(nameStr) + ingred;
 			return (
-				<div className="ingredient" key={keyStr} >
+				<div className="ingredient" key={i} >
 					{ingred}
 				</div>
 			);
 		});
 
 		return (
-			<div className="ingredientList">
-				{ingredientNodes}
+			<div className={classStrOutter}>
+				<p className="h4" onClick={this.toggleIngredients}>{this.state.name}</p>
+				<div className={classStr}>
+					<p className="h5">INGREDIENTS</p>
+
+					<div className="ingredientList">
+						{ingredientNodes}
+					</div>
+
+					<div className="button-section">
+						<li className="buttons"><button className="btn btn-danger" data={this.state.name} onClick={this.deleteRecipe} >Delete</button></li>
+						<li className="buttons"><MModalEdit data={this.state.name}></MModalEdit></li>
+					</div>
+				</div>
 			</div>
 		);
 	}
 });
 
-var Buttons = React.createClass({
-	deleteRecipe: function() {
-		console.log('deleting recipe: ' + this.props.data);
-		localStorage.removeItem(this.props.data);
-//TODO this event should also result in updating the RecipeList view
-	},
-
-	render: function() {
-		return (
-			<div className="button-section">
-				<li className="buttons"><button className="btn btn-danger" data={this.props.data} onClick={this.deleteRecipe} >Delete</button></li>
-				<li className="buttons"><MModalEdit data={this.props.data}></MModalEdit></li>
-			</div>
-			);
-	}
-});
-
 var MModalAdd = React.createClass({
-
 	getInitialState: function() {
 		return { modalIsOpen: false, names: []};
 	},
@@ -209,8 +219,6 @@ var MModalAdd = React.createClass({
 	closeModal: function(event) {
 		event.preventDefault();
 		this.setState({modalIsOpen: false});
-//TODO hardcoded a browser refresh to get the latest list of recipes but I don't think this is the best way
-		document.location.reload(true);
 //TODO how to get the recipe list to update when the modal is closed
 	},
 
@@ -251,28 +259,27 @@ var MModalAdd = React.createClass({
 
 	render: function() {
 		return (
+			<div className="clear">
+				<button className="btn btn-default btn-add" onClick={this.openModal} >Add Recipe</button>
+				<Modal
+					isOpen={this.state.modalIsOpen}
+					onRequestClose={this.closeModal}
+					style={customStyles} >
+					<p className="h4">Add a recipe <i className="fa fa-times" onClick={this.closeModal}></i></p>
 
-				<div className="clear">
-					<button className="btn btn-default btn-add" onClick={this.openModal} >Add Recipe</button>
-					<Modal
-						isOpen={this.state.modalIsOpen}
-						onRequestClose={this.closeModal}
-						style={customStyles} >
-						<p className="h4">Add a recipe <i className="fa fa-times" onClick={this.closeModal}></i></p>
-
-						<form id="recipeForm">
-							<div className="form-group">
-								<label htmlFor="recipe-name">Name</label>
-								<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" />
-							</div>
-							<div className="form-group">
-								<label htmlFor="recipe-ingredients">Ingredients</label>
-								<input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" placeholder="enter ingredients separated by commas" size="50" />
-							</div>
-							<button type="submit" onClick={this.saveRecipe} className="btn btn-primary">Add Recipe</button> <button className="btn btn-default" onClick={this.closeModal}>Close</button>
-						</form>
-					</Modal>
-				</div>
+					<form id="recipeForm">
+						<div className="form-group">
+							<label htmlFor="recipe-name">Name</label>
+							<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" />
+						</div>
+						<div className="form-group">
+							<label htmlFor="recipe-ingredients">Ingredients</label>
+							<input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" placeholder="enter ingredients separated by commas" size="50" />
+						</div>
+						<button type="submit" onClick={this.saveRecipe} className="btn btn-primary">Add Recipe</button> <button className="btn btn-default" onClick={this.closeModal}>Close</button>
+					</form>
+				</Modal>
+			</div>
 		);
 	}
 });
