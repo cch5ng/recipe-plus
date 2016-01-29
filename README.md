@@ -11,10 +11,10 @@
 ## Status
 
 * FIX: all buttons are updating the localStorage appropriately but they are not updating the state of the respective component appropriate
-  * (DONE) Add button
   * Delete button (not sure how to go from recipe to recipeList)
-  * Edit button
-* FIX: want the main list to refresh (update state for RecipeList) whenever the modal is updated (save, edit, delete)
+  * (DONE) Add button
+  * (DONE) Edit button
+  * DONE: want the main list to refresh (update state for RecipeList) whenever the modal is updated (save, edit, delete)
 * FIX: when user tries to save new recipe, there should be validation to check that name is a unique key in localStorage, otherwise suggest a different one (otherwise the old value would get overwritten even if the user doesn't intend)
 * STYLE: make everything look beautiful
 * DONE: accordion should keep state (isOpen) dependent on click handler
