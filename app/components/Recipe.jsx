@@ -41,7 +41,7 @@ export default class Recipe extends React.Component {
 		let ingredientsStr;
 		let nameStr = this.props.name;
 		//console.log('this.props.data: ' + this.props.data);
-		ingredientsStr = localStorage.getItem(this.state.name);
+		ingredientsStr = localStorage.getItem(name);
 		//console.log('ingredientsStr: ' + ingredientsStr);
 		if (ingredientsStr) {
 //on data input to localStorage, spaces are trimmed so list should be strictly comma-delimited
