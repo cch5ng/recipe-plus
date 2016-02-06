@@ -12,9 +12,9 @@ export default class Recipe extends React.Component {
 		super(props);
 
 		this.state = {
-			isOpen: false,
-			name: this.props.data,
-			ingredients: this.getIngredients()
+			isOpen: false//,
+			//name: this.props.data,
+			//ingredients: this.getIngredients()
 		}
 	}
 
@@ -27,15 +27,19 @@ export default class Recipe extends React.Component {
 	// },
 
 	render() {
+		var key = this.props.key;
+		var name = this.props.name;
+		console.log('name: ' + name);
+
 		let classStr, classStrOutter;
 		(this.state.isOpen) ? classStr = this.concatName() + ' padding' : classStr = this.concatName() + ' padding hidden';
 		//let classStrOutter = 'recipe clear';
 //TO FIX - temp fix for removing deleted recipe from view but it is a hack (only hiding it with css and not
 //truly updating the parent state, names in RecipeList)
-		(this.state.name) ? classStrOutter = 'recipe clear' : classStrOutter = 'recipe clear hidden';
+		(name) ? classStrOutter = 'recipe clear' : classStrOutter = 'recipe clear hidden';
 		let ingredientsAr = [];
 		let ingredientsStr;
-		let nameStr = this.state.name;
+		let nameStr = this.props.name;
 		//console.log('this.props.data: ' + this.props.data);
 		ingredientsStr = localStorage.getItem(this.state.name);
 		//console.log('ingredientsStr: ' + ingredientsStr);
@@ -53,9 +57,11 @@ export default class Recipe extends React.Component {
 			);
 		});
 
+
 		return (
-			<div className={classStrOutter} >
-				<p className="h4" onClick={this.toggleIngredients}>{this.state.name}</p>
+			//<div >{name}</div>
+			<div className={classStrOutter} key={key}>
+				<p className="h4" onClick={this.toggleIngredients}>{name}</p>
 				<div className={classStr}>
 					<p className="h5">INGREDIENTS</p>
 
@@ -117,7 +123,8 @@ export default class Recipe extends React.Component {
 	//concatenate names (removing spaces), otherwise the class name used to select a particular
 	//recipe name would break due to spaces
 	concatName = () => {
-		let nameAr = this.props.data.split(' ');
+		let name = this.props.name;
+		let nameAr = name.split(' ');
 		let nameStr = nameAr.join('');
 		return nameStr;
 	};

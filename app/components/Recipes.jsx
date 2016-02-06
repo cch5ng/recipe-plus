@@ -2,16 +2,18 @@
 
 import React from 'react';
 import Recipe from './Recipe.jsx';
+import uuid from 'node-uuid';
 import {Modal} from 'react-bootstrap';
 import {Button} from 'react-bootstrap';
 import {Input} from 'react-bootstrap';
 
+//({recipes}) =>
 export default class Recipes extends React.Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			names : '',
+			//names : '',
 			nameValid: 'success'
 		}
 	}
@@ -22,24 +24,53 @@ export default class Recipes extends React.Component {
 	// },
 
 	render() {
-		let namesAr2 = [];
-		if (this.state.names) {
-			//console.log('this.state.names: ' + this.state.names);
-			namesAr2 = this.state.names.split(',');
-		}
+		var recipes = this.props.recipes;
+		console.log('recipes: ' + recipes);
+		console.log('recipe1: ');
+		console.log('id: ' + recipes[0].id);
+		console.log('name: ' + recipes[0].name);
+		console.log('recipe2: ');
+		console.log('id: ' + recipes[1].id);
+		console.log('name: ' + recipes[1].name);
+		console.log('recipe3: ');
+		console.log('id: ' + recipes[2].id);
+		console.log('name: ' + recipes[2].name);
+		console.log('recipe4: ');
+		console.log('id: ' + recipes[3].id);
+		console.log('name: ' + recipes[3].name);
+		{/*
+			let namesAr2 = [];
+			if (this.state.names) {
+				//console.log('this.state.names: ' + this.state.names);
+				namesAr2 = this.state.names.split(',');
+			}
+			console.log('namesAr2: ' + namesAr2);
+			let recipes = [];
+			namesAr2.forEach(name => {
+				let mrecipe = {};
+				mrecipe.name = name;
+				mrecipe.id = uuid.v4();
+				recipes.push(mrecipe);
+			});
+			console.log('recipes: ' + recipes);
+		*/}
 
-		var recipeNodes = namesAr2.map(function(recipe, i) {
-			return (
-				<Recipe key={i} data={recipe}  >
-					{recipe}
-				</Recipe>
-			);
-		});
+		{/*
+		// var recipeNodes = namesAr2.map(function(recipe, i) {
+		//	return (
+		//		<Recipe key={i} data={recipe}  >
+		//			{recipe}
+		//		</Recipe>
+		//	);
+		//});
+		*/}
 
 		return (
 			<div className="recipeList">
 				<ul>
-					{recipeNodes}
+					{recipes.map(recipe =>
+						<Recipe key={recipe.id} name={recipe.name} />
+					)}
 				</ul>
 				<Button
 					bsStyle="default"
