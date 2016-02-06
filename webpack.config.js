@@ -1,7 +1,7 @@
 //webpack.config.js
 
 const path = require('path');
-const HtmlwebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const TARGET = process.env.npm_lifecycle_event;
 const PATHS = {
@@ -53,7 +53,7 @@ const common = {
 		}]
   },
   plugins: [
-    new HtmlwebpackPlugin({
+    new HtmlWebpackPlugin({
     	template: 'node_modules/html-webpack-template/index.html',
     	title: 'Recipe Box app',
     	appMountId: 'app'
