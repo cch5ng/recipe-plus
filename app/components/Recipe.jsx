@@ -12,9 +12,9 @@ export default class Recipe extends React.Component {
 		super(props);
 
 		this.state = {
-			isOpen: false//,
-			//name: this.props.data,
-			//ingredients: this.getIngredients()
+			isOpen: false,
+			name: this.props.name,
+			ingredients: this.getIngredients()
 		}
 	}
 
@@ -92,7 +92,7 @@ export default class Recipe extends React.Component {
 									<form id="recipeEditForm">
 										<div className="form-group">
 											<label htmlFor="recipeName">Name</label>
-											<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" value={this.props.data} readOnly />
+											<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" value={this.props.name} readOnly />
 										</div>
 										<div className="form-group">
 											<label htmlFor="recipeIngredientsEdit">Ingredients</label>
@@ -102,7 +102,7 @@ export default class Recipe extends React.Component {
 								</Modal.Body>
 
 								<Modal.Footer>
-									<Button type="submit" onClick={this.editRecipe} bsStyle="primary">Edit Recipe</Button>
+									<Button type="submit" onClick={this.editRecipe} bsStyle="primary">Save</Button>
 									<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>
 								</Modal.Footer>
 							</Modal>
@@ -114,7 +114,7 @@ export default class Recipe extends React.Component {
 	}
 
 	getIngredients = () => {
-		let ingredientsStr = localStorage.getItem(this.props.data);
+		let ingredientsStr = localStorage.getItem(this.props.name);
 		//console.log('ingredientsStr: ' + ingredientsStr);
 		return ingredientsStr;
 	};
@@ -157,7 +157,7 @@ export default class Recipe extends React.Component {
 		event.preventDefault();
 
 	//parsing the ingredients, cleaning up the format so it will display cleanly later on
-		var name = this.props.data
+		let name = this.props.name
 		//console.log('name: ' + name);
 		var ingredientsStr = this.state.ingredients;
 		var ingredientsAr = ingredientsStr.split(',');

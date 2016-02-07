@@ -23,19 +23,8 @@ export default class Recipes extends React.Component {
 
 	render() {
 		var onDelete = this.props.onDelete;
-		//var onAdd = this.props.onAdd;
+		var onEdit = this.props.onEdit;
 		var recipes = this.props.recipes;
-		console.log('type of recipes in Recipes: ' + typeof recipes);
-		// console.log('recipes: ' + recipes);
-		// console.log('recipe1: ');
-		// console.log('id: ' + recipes[0].id);
-		// console.log('name: ' + recipes[0].name);
-		// // console.log('recipe2: ');
-		// console.log('id: ' + recipes[1].id);
-		// console.log('name: ' + recipes[1].name);
-		// console.log('recipe3: ');
-		// console.log('id: ' + recipes[2].id);
-		// console.log('name: ' + recipes[2].name);
 
 		return (
 			<div className="recipeList">
