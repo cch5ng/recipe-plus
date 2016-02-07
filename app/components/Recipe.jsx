@@ -28,8 +28,11 @@ export default class Recipe extends React.Component {
 
 	render() {
 		var key = this.props.key;
+//		console.log('key: ' + key);
 		var name = this.props.name;
-		console.log('name: ' + name);
+		const onDelete = this.props.onDelete;
+		console.log('onDelete: ' + onDelete);
+//		console.log('name: ' + name);
 
 		let classStr, classStrOutter;
 		(this.state.isOpen) ? classStr = this.concatName() + ' padding' : classStr = this.concatName() + ' padding hidden';
@@ -70,7 +73,8 @@ export default class Recipe extends React.Component {
 					</div>
 
 					<div className="button-section">
-						<Button bsStyle="danger" data={this.state.name} onClick={this.deleteRecipe} >Delete</Button>
+						{onDelete ? this.renderDelete() : null}
+						
 						<Button bsStyle="default" onClick={() => this.setState({ show: true})}>Edit</Button>
 
 						<div className="modal-container">
@@ -137,6 +141,7 @@ export default class Recipe extends React.Component {
 		}
 	};
 
+//move to App?
 	deleteRecipe = () => {
 		console.log('deleting recipe: ' + this.state.name);
 		localStorage.removeItem(this.state.name);
@@ -172,6 +177,9 @@ export default class Recipe extends React.Component {
 		form.reset();
 	};
 
+	renderDelete = () => {
+		return <Button bsStyle="danger" data={this.state.name} onClick={this.props.onDelete} >Delete</Button>
+	};
 
 //});
 

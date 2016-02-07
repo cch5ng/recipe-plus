@@ -59,8 +59,23 @@ export default class App extends React.Component {
 		console.log('todo: editRecipe');
 	};
 
-	deleteRecipe = () => {
-		console.log('todo: deleteRecipe');
+	deleteRecipe = (id) => {
+		let name;
+		let recipes = this.state.recipes;
+//update localStorage
+		recipes.forEach(recipe => {
+			if (recipe.id === id) {
+				name = recipe.name
+			}
+		})
+		localStorage.removeItem(name);
+//update state var
+		console.log('recipe id to delete: ' + id);
+		this.setState({
+			recipes: this.state.recipes.filter(recipe => recipe.id !== id)
+		})
+		//this.setState({name: null});
+//		console.log('todo: deleteRecipe');
 	};
 
 	getNames = () => {
