@@ -136,7 +136,11 @@ export default class App extends React.Component {
 		}
 	};
 
-	//perform validation to ensure that name field is unique (key in localStorage)
+	/**
+	 * Form validation to ensure that a new name field is unique (key in localStorage)
+	 * @param  {[type]} event [description]
+	 * @return {[type]}       [description]
+	 */
 	validationState = (event) => {
 		let matchCount;
 		let curName = event.target.value;
@@ -147,18 +151,23 @@ export default class App extends React.Component {
 		}
 	};
 
+	/**
+	 * Deletes a recipe from localStorage and state (recipes array). Triggered from Recipe.jsx button.
+	 * @param  {String} id - Recipe id
+	 * @return {[type]}    [description]
+	 */
 	deleteRecipe = (id) => {
 		let name;
 		let recipes = this.state.recipes;
-//update localStorage
+
 		recipes.forEach(recipe => {
 			if (recipe.id === id) {
 				name = recipe.name
 			}
 		})
 		localStorage.removeItem(name);
-//update state var
-		console.log('recipe id to delete: ' + id);
+
+		//console.log('recipe id to delete: ' + id);
 		this.setState({
 			recipes: this.state.recipes.filter(recipe => recipe.id !== id)
 		})

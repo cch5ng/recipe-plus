@@ -6,7 +6,6 @@ import {Button} from 'react-bootstrap';
 import {Input} from 'react-bootstrap';
 
 export default class Recipe extends React.Component {
-//var Recipe = React.createClass({
 
 	constructor(props) {
 		super(props);
@@ -18,14 +17,6 @@ export default class Recipe extends React.Component {
 		}
 	}
 
-	// getInitialState: function() {
-	// 	return {isOpen: false, name: this.props.data, ingredients: this.getIngredients()}
-	// },
-
-	// componentDidMount: function() {
-	// 	this.render();
-	// },
-
 	render() {
 		var key = this.props.key;
 //		console.log('key: ' + key);
@@ -34,11 +25,9 @@ export default class Recipe extends React.Component {
 		console.log('onDelete: ' + onDelete);
 //		console.log('name: ' + name);
 
+		//using the recipe name as a unique identifier to set className and accordion display state
 		let classStr, classStrOutter;
 		(this.state.isOpen) ? classStr = this.concatName() + ' padding' : classStr = this.concatName() + ' padding hidden';
-		//let classStrOutter = 'recipe clear';
-//TO FIX - temp fix for removing deleted recipe from view but it is a hack (only hiding it with css and not
-//truly updating the parent state, names in RecipeList)
 		(name) ? classStrOutter = 'recipe clear' : classStrOutter = 'recipe clear hidden';
 		let ingredientsAr = [];
 		let ingredientsStr;
@@ -60,23 +49,17 @@ export default class Recipe extends React.Component {
 			);
 		});
 
-
 		return (
-			//<div >{name}</div>
 			<div className={classStrOutter} key={key}>
 				<p className="h4" onClick={this.toggleIngredients}>{name}</p>
 				<div className={classStr}>
 					<p className="h5">INGREDIENTS</p>
-
 					<div className="ingredientList">
 						{ingredientNodes}
 					</div>
-
 					<div className="button-section">
 						{onDelete ? this.renderDelete() : null}
-						
 						<Button bsStyle="default" onClick={() => this.setState({ show: true})}>Edit</Button>
-
 						<div className="modal-container">
 							<Modal
 								show={this.state.show}
@@ -113,19 +96,31 @@ export default class Recipe extends React.Component {
 		);
 	}
 
+	/**
+	 * Gets ingredients from localStorage and puts them in state.
+	 * @return {[type]} [description]
+	 */
 	getIngredients = () => {
 		let ingredientsStr = localStorage.getItem(this.props.name);
 		//console.log('ingredientsStr: ' + ingredientsStr);
 		return ingredientsStr;
 	};
 
+	/**
+	 * Updates state with edit form values
+	 * @param  {[type]} event [description]
+	 * @return {[type]}       [description]
+	 */
 	updateIngredientsField = (event) => {
 		this.setState({ingredients: event.target.value});
 		//console.log('this.state.ingredients: ' + this.state.ingredients);
 	};
 
-	//concatenate names (removing spaces), otherwise the class name used to select a particular
-	//recipe name would break due to spaces
+	/**
+	 * Concatenate multi-word names (removing spaces), otherwise the class name used to select
+	 * a long name would break the accordion display functionality due to spaces
+	 * @return {[type]} [description]
+	 */
 	concatName = () => {
 		let name = this.props.name;
 		let nameAr = name.split(' ');
@@ -133,6 +128,10 @@ export default class Recipe extends React.Component {
 		return nameStr;
 	};
 
+	/**
+	 * Toggles accordion visibility. Modifies state, isOpen.
+	 * @return {[type]} [description]
+	 */
 	toggleIngredients = () => {
 		if (this.state.isOpen) {
 			this.setState({isOpen: false});
@@ -141,18 +140,11 @@ export default class Recipe extends React.Component {
 		}
 	};
 
-//move to App?
-	deleteRecipe = () => {
-		console.log('deleting recipe: ' + this.state.name);
-		localStorage.removeItem(this.state.name);
-		this.setState({name: null});
-		//this is a hack to get delete to work properly, should actually update the RecipeList state, names
-		//not sure how to get into it w/o flux?
-		document.location.reload(true);
-
-//TODO this event should also result in updating the RecipeList view
-	};
-
+	/**
+	 * Updates localStorage and state with edit form ingredients values
+	 * @param  {[type]} event [description]
+	 * @return {[type]}       [description]
+	 */
 	editRecipe = (event) => {
 		event.preventDefault();
 
@@ -180,12 +172,14 @@ export default class Recipe extends React.Component {
 	renderDelete = () => {
 		return <Button bsStyle="danger" data={this.state.name} onClick={this.props.onDelete} >Delete</Button>
 	};
-
-//});
-
 }
 
-//helper remove spaces between chars/words; used to create ingredient unique keys where the recipe has mult words
+/**
+ * Helper that removes spaces between chars/words; used to create recipe name
+ * unique keys where the name has multiple words
+ * @param  {[type]} str [description]
+ * @return {[type]}     [description]
+ */
 function trimSpaces(str) {
 	let ar = [], resultStr;
 	ar = str.split(' ');
