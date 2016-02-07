@@ -22,13 +22,17 @@ export default class App extends React.Component {
 			recipes.push(mrecipe);
 		});
 		this.state = {
-			recipes : recipes //,
-			//nameValid: 'success'
+			recipes: recipes,
+			show: false,
+			nameValid: 'success'
 		}
 	}
 
 	render() {
-		const recipes = this.state.recipes;
+		let recipes = this.state.recipes;
+		console.log('typeof recipes in App: ' + typeof recipes);
+		//console.log('app recipes: ' + recipes);
+		//console.log('app recipes length: ' + recipes.length);
 		//const nameValid = this.state.nameValid;
 		return (
 			<div className="container-fluid" >
@@ -43,6 +47,54 @@ export default class App extends React.Component {
 				<Recipes recipes={recipes} onEdit={this.editRecipe} onDelete={this.deleteRecipe} />
 {/* nameValid={nameValid} */}
 
+				<Button
+					bsStyle="default"
+					onClick={() => this.setState({ show: true})}> {/*  */}
+						Add Recipe
+				</Button>
+
+				<div className="modal-container">
+					<Modal
+						show={this.state.show}
+						onHide={close}
+						container={this}
+						aria-labelledby="contained-modal-title">
+
+						<Modal.Header>
+							<Modal.Title>Add Recipe</Modal.Title>
+						</Modal.Header>
+
+						<Modal.Body>
+							<form id="recipeForm">
+								<div className="form-group">
+									<Input type="text" 
+										label="Name" 
+										groupClassName="group-class"
+										labelClassName="label-class"
+										id="recipeName"
+										name="recipeName"
+										size="50"
+										help="Name must be unique or recipe will not be saved."
+										bsStyle={this.state.nameValid} hasFeedback
+										onChange={this.validationState}
+									/>
+								</div>
+								<div className="form-group">
+									<label htmlFor="recipe-ingredients">Ingredients</label>
+									<input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" placeholder="enter ingredients separated by commas" size="50" />
+								</div>
+							</form>
+						</Modal.Body>
+
+						<Modal.Footer>
+							<Button type="submit" onClick={this.addRecipe} bsStyle="primary" >Add Recipe</Button>
+			{/* onClick={this.saveRecipe} */}
+							<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>
+						</Modal.Footer>
+					</Modal>
+				</div>
+
+
 				<div className="row footer">
 					<div className="col-xs-12 col-sm-12">
 						<p className="text-center">Brought to you with <i className="fa fa-heart"></i><br /> 
@@ -54,6 +106,74 @@ export default class App extends React.Component {
 			</div>
 		);
 	}
+
+	/**
+	 * Adds recipe to local storage and to state
+	 * @param  {[type]} event [description]
+	 * @return {[type]}       [description]
+	 */
+	addRecipe = (event) => {
+		console.log('todo: addRecipe for ' );
+		if (this.state.nameValid === 'success') {
+			event.preventDefault();
+
+	//parsing the ingredients, cleaning up the format so it will display cleanly later on
+			// console.log('clicked save');
+			//let existingNames = this.getNames();
+			let name = document.getElementById('recipeName').value;
+			console.log('name: ' + name);
+			var ingredientsStr = document.getElementById('recipeIngredients').value;
+			// console.log('ingredientsStr: ' + ingredientsStr);
+			var ingredientsAr = ingredientsStr.split(',');
+		//stores final array of ingredients strings, trimmed
+			var ingredientsTrim = [];
+			// console.log('ingredientsAr: ' + ingredientsAr);
+			// console.log('length ingredientsAr: ' + ingredientsAr.length);
+			ingredientsAr.forEach(function(item) {
+				// console.log('item: ' + item);
+				var itemCopy = item.slice(0).trim();
+				ingredientsTrim.push(itemCopy);
+			});
+			//making the ingredients list in localStorage comma delimited but no space
+			var ingredientsStrClean = ingredientsTrim.join(',');
+			//console.log('ingredientsStrClean: ' + ingredientsStrClean);
+
+	//updating localStorage
+			localStorage.setItem(name, ingredientsStrClean);
+			//console.log('names: ' + this.getNames());
+
+			//let namesStr;
+			//namesStr = existingNames + ',' + name;
+			//console.log('save namesStr: ' + namesStr);
+			//this.setState({names: namesStr});
+
+			let form = document.getElementById('recipeForm');
+			form.reset();
+
+			let curRecipes = this.state.recipes;
+
+			let recipeObj = {};
+			recipeObj.id = uuid.v4();
+			recipeObj.name = name;
+
+			curRecipes.push(recipeObj);
+			this.setState({recipes: curRecipes});
+			console.log('typeof recipes from addRecipes: ' + typeof this.state.recipes);
+			//console.log('recipes length: ' + this.state.recipes.length);
+		}
+
+	};
+
+	//perform validation to ensure that name field is unique (key in localStorage)
+	validationState = (event) => {
+		let matchCount;
+		let curName = event.target.value;
+		if (localStorage.getItem(curName)) {
+			this.setState({nameValid: 'error'});
+		} else {
+			this.setState({nameValid: 'success'});
+		}
+	};
 
 	editRecipe = () => {
 		console.log('todo: editRecipe');
@@ -74,6 +194,7 @@ export default class App extends React.Component {
 		this.setState({
 			recipes: this.state.recipes.filter(recipe => recipe.id !== id)
 		})
+		console.log('typeof recipes from deleteRecipe: ' + typeof recipes);
 		//this.setState({name: null});
 //		console.log('todo: deleteRecipe');
 	};

@@ -23,12 +23,14 @@ export default class Recipes extends React.Component {
 
 	render() {
 		var onDelete = this.props.onDelete;
+		//var onAdd = this.props.onAdd;
 		var recipes = this.props.recipes;
+		console.log('type of recipes in Recipes: ' + typeof recipes);
 		// console.log('recipes: ' + recipes);
 		// console.log('recipe1: ');
 		// console.log('id: ' + recipes[0].id);
 		// console.log('name: ' + recipes[0].name);
-		// console.log('recipe2: ');
+		// // console.log('recipe2: ');
 		// console.log('id: ' + recipes[1].id);
 		// console.log('name: ' + recipes[1].name);
 		// console.log('recipe3: ');
@@ -36,57 +38,13 @@ export default class Recipes extends React.Component {
 		// console.log('name: ' + recipes[2].name);
 
 		return (
-			<div className="recipeList" >
+			<div className="recipeList">
 				<ul>
 					{recipes.map(recipe =>
 						<Recipe key={recipe.id} name={recipe.name} onDelete={onDelete.bind(null, recipe.id)} />
 					)}
 				</ul>
-				<Button
-					bsStyle="default"
-					onClick={() => this.setState({ show: true})}>
-						Add Recipe
-				</Button>
 
-				<div className="modal-container">
-					<Modal
-						show={this.state.show}
-						onHide={close}
-						container={this}
-						aria-labelledby="contained-modal-title">
-
-						<Modal.Header>
-							<Modal.Title>Add Recipe</Modal.Title>
-						</Modal.Header>
-
-						<Modal.Body>
-							<form id="recipeForm">
-								<div className="form-group">
-									<Input type="text" 
-										label="Name" 
-										groupClassName="group-class"
-										labelClassName="label-class"
-										id="recipeName"
-										name="recipeName"
-										size="50"
-										help="Name must be unique or original ingredients will be lost."
-										bsStyle={this.state.nameValid} hasFeedback
-										onChange={this.validationState}
-									/>
-								</div>
-								<div className="form-group">
-									<label htmlFor="recipe-ingredients">Ingredients</label>
-									<input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" placeholder="enter ingredients separated by commas" size="50" />
-								</div>
-							</form>
-						</Modal.Body>
-
-						<Modal.Footer>
-							<Button type="submit" onClick={this.saveRecipe} bsStyle="primary" >Add Recipe</Button>
-							<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>
-						</Modal.Footer>
-					</Modal>
-				</div>
 			</div>
 		);
 	}
@@ -117,6 +75,12 @@ export default class Recipes extends React.Component {
 		let namesStr = this.getNames();
 		this.setState({names: namesStr});
 		this.render();
+	};
+
+	getNewName = () => {
+		let name = document.getElementById('recipeName').value;
+		console.log('new name: ' + name);
+		return name;
 	};
 
 	saveRecipe = (event) => {
