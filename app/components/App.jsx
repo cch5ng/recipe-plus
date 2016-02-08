@@ -192,7 +192,7 @@ export default class App extends React.Component {
 			}
 		}
 		//console.log('namesStr: ' + namesStr);
-		console.log('storage count: ' + namesCount);
+		//console.log('storage count: ' + namesCount);
 		return namesStr;
 	};
 }

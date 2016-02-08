@@ -22,7 +22,6 @@ export default class Recipe extends React.Component {
 //		console.log('key: ' + key);
 		var name = this.props.name;
 		const onDelete = this.props.onDelete;
-		console.log('onDelete: ' + onDelete);
 //		console.log('name: ' + name);
 
 		//using the recipe name as a unique identifier to set className and accordion display state
