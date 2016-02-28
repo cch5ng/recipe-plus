@@ -20,7 +20,7 @@ export default class AddRecipe extends React.Component {
 
 	render () {
 		return (
-				<div className="modal-container">
+				<div className="container-fluid">
 					{/*<Modal
 						show={this.state.show}
 						onHide={close}
@@ -33,23 +33,14 @@ export default class AddRecipe extends React.Component {
 
 						<Modal.Body>*/}
 							<form id="recipeForm">
-								<div className="form-group">
-									<Input type="text" 
-										label="Name" 
-										groupClassName="group-class"
-										labelClassName="label-class"
-										id="recipeName"
-										name="recipeName"
-										size="50"
-										help="Name must be unique or recipe will not be saved."
-										bsStyle={this.state.nameValid} hasFeedback
-										onChange={this.validationState}
-									/>
-								</div>
-								<div className="form-group">
-									<label htmlFor="recipe-ingredients">Ingredients</label>
-									<input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" placeholder="enter ingredients separated by commas" size="50" />
-								</div>
+								<Input type="text" label="Name" groupClassName="group-class" labelClassName="label-class"
+									id="recipeName" name="recipeName" size="50" help="Name must be unique or recipe will not be saved."
+									bsStyle={this.state.nameValid} hasFeedback onChange={this.validationState}
+								/>
+								<Input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" label="Ingredients" placeholder="enter ingredients separated by commas" size="50" />
+								<Input type="textarea" className="form-control" id="recipeSteps" name="recipeSteps" label="Steps" placeholder="separate steps by empty paragraph" size="200" />
+
+
 							</form>
 						{/*</Modal.Body>
 
@@ -78,5 +69,44 @@ export default class AddRecipe extends React.Component {
 		}
 	};
 
+	/**
+	 * Adds recipe to local storage and to state
+	 * @param  {[type]} event [description]
+	 * @return {[type]}       [description]
+	 */
+	addRecipe = (event) => {
+		if (this.state.nameValid === 'success') {
+			event.preventDefault();
+
+	//parsing the ingredients, cleaning up the format so it will display cleanly later on
+			let name = document.getElementById('recipeName').value;
+			console.log('name: ' + name);
+			var ingredientsStr = document.getElementById('recipeIngredients').value;
+			var ingredientsAr = ingredientsStr.split(',');
+		//stores final array of ingredients strings, trimmed
+			var ingredientsTrim = [];
+			ingredientsAr.forEach(function(item) {
+				var itemCopy = item.slice(0).trim();
+				ingredientsTrim.push(itemCopy);
+			});
+			//making the ingredients list in localStorage comma delimited but no space
+			var ingredientsStrClean = ingredientsTrim.join(',');
+
+	//updating localStorage
+			localStorage.setItem(name, ingredientsStrClean);
+
+			let form = document.getElementById('recipeForm');
+			form.reset();
+
+			let curRecipes = this.state.recipes;
+			let recipeObj = {};
+			recipeObj.id = uuid.v4();
+			recipeObj.name = name;
+			curRecipes.push(recipeObj);
+			this.setState({recipes: curRecipes});
+			//console.log('typeof recipes from addRecipes: ' + typeof this.state.recipes);
+			//console.log('recipes length: ' + this.state.recipes.length);
+		}
+	};
 
 }
