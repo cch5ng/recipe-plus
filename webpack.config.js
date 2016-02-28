@@ -54,7 +54,7 @@ const common = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-    	template: 'node_modules/html-webpack-template/index.html',
+    	template: 'node_modules/html-webpack-template/index.ejs',
     	title: 'Recipe Box app',
     	appMountId: 'app'
     })

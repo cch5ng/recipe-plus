@@ -3,6 +3,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App.jsx';
+import AddRecipe from './components/AddRecipe.jsx';
+import {Router, Route, hashHistory} from 'react-router';
 //import './fixed-data-table.css';
 
 require("!style!css!sass!./main.scss");
@@ -10,4 +12,9 @@ require("!style!css!sass!./main.scss");
 
 var css = require("!css!sass!./main.scss");
 
-ReactDOM.render(<App />, document.getElementById('app'));
+ReactDOM.render((
+	<Router history={hashHistory}>
+		<Route path='/' component={App}/>
+		<Route path='/add' component={AddRecipe}/>
+	</Router>
+	), document.getElementById('app'));

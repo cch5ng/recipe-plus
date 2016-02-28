@@ -1,7 +1,7 @@
-# Recipe Box
+# Recipe Plus
 
 * Written with React, SASS, IndexedDB, ES6. Using Webpack.
-* For Free Code Camp
+* Update on Free Code Camp project
 
 ## Limitations
 

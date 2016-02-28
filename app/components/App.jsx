@@ -8,6 +8,7 @@ import uuid from 'node-uuid';
 import {Modal} from 'react-bootstrap';
 import {Button} from 'react-bootstrap';
 import {Input} from 'react-bootstrap';
+import {Link} from 'react-router';
 
 export default class App extends React.Component {
 	constructor(props) {
@@ -35,7 +36,13 @@ export default class App extends React.Component {
 				<div className="row">
 					<nav className="navbar navbar-default">
 						<div className="navbar-header">
-							<a className="navbar-brand" href="#">Recipe Box</a>
+							<a className="navbar-brand" href="#">Recipe Plus</a>
+						</div>
+						<div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+								<ul className="nav navbar-nav navbar-right">
+									<li className="active"><Link to='/add'>Add Recipe</Link></li>
+									<li><a href="#">Link</a></li>
+								</ul>
 						</div>
 					</nav>
 				</div>
