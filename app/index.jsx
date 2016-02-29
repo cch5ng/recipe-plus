@@ -16,10 +16,9 @@ var css = require("!css!sass!./main.scss");
 
 ReactDOM.render((
 	<Router history={hashHistory}>
-		<Route path='/' component={App}>
-			<Route path='/recipe/:id' component={Recipe} />
-		</Route>
+		<Route path='/' component={App} />
 		<Route path='/add' component={AddRecipe} />
+		<Route path='/recipe/:key' component={Recipe} />
 
 	</Router>
 	), document.getElementById('app'));
