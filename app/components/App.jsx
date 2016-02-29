@@ -16,15 +16,27 @@ export default class App extends React.Component {
 		super(props);
 		let namesAr = [];
 		var recipes = [];
-		namesAr = this.getNames().split(',');
-		namesAr.forEach(name => {
-			let mrecipe = {};
-			mrecipe.name = name;
-			mrecipe.id = uuid.v4();
-			recipes.push(mrecipe);
-		});
+
+		namesAr = this.getNames();
+		console.log('namesAr: ' + namesAr);
+		console.log('length namesAr: ' + namesAr.length);
+
+
+		// this.forEachKey(this.populateNamesAr);
+		// //setTimeoutInterval(() => {
+		// 	this.namesAr.forEach(name => {
+		// 		let mrecipe = {};
+		// 		mrecipe.name = name;
+		// 		mrecipe.id = uuid.v4();
+		// 		recipes.push(mrecipe);
+		// 	});
+		//}, 500);
+		// if (namesAr.length === localStorage.length) {
+		// 	this.setState({namesAr: this.namesAr});
+		// }
 		this.state = {
 			recipes: recipes,
+			namesAr: namesAr,
 			show: false,
 			nameValid: 'success'
 		}
@@ -35,7 +47,7 @@ export default class App extends React.Component {
 		return (
 			<div className="container-fluid" >
 				<Nav />
-				<Recipes recipes={recipes} onDelete={this.deleteRecipe} />
+				<Recipes recipes={recipes} namesAr={this.state.namesAr} onDelete={this.deleteRecipe} />
 				<Link to='/add'><Button bsStyle="default"> {/* onClick={() => this.setState({ show: true})} */}
 					Add Recipe
 				</Button></Link>
@@ -126,23 +138,41 @@ export default class App extends React.Component {
 
 	/**
 	 * Gets recipe names from localStorage
-	 * @return {String} Comma-delimited list of names
+	 * @return Array of {String} with list of names
 	 */
 	getNames = () => {
-		let namesStr = '';
+		//let namesStr = '';
+		let namesAr = []
 		let namesCount;
 		namesCount = localStorage.length;
 		//console.log('namesCount: ' + namesCount);
 		for (let i = 0; i < namesCount; i++) {
+			namesAr.push(localStorage.key(i));
 			//(namesCount - 1) prevents extra empty list item at the bottom
-			if (i < namesCount - 1) {
-				namesStr += localStorage.key(i) + ',';
-			} else {
-				namesStr += localStorage.key(i);
-			}
+			// if (i < namesCount - 1) {
+			// 	namesStr += localStorage.key(i) + ',';
+			// } else {
+			// 	namesStr += localStorage.key(i);
+			// }
 		}
-		console.log('namesStr: ' + namesStr);
+		console.log('namesAr: ' + namesAr);
 		//console.log('storage count: ' + namesCount);
-		return namesStr;
+		return namesAr;
 	};
+
+	//helper iterate over local storage keys
+// 	forEachKey = (callback) => {
+// //	function forEachKey(callback) {
+// 		let namesArIn = []
+// 		for (var i = 0; i < localStorage.length; i++) {
+// 			callback(localStorage.key(i));
+// 		}
+// 	}
+
+// 	populateNamesAr = (item) => {
+// 		console.log('item: ' + item);
+// 		console.log('namesAr: ' + this.namesAr);
+// 		this.namesAr.push(item);
+// 	}
+
 }
