@@ -40,57 +40,19 @@ export default class App extends React.Component {
 						</div>
 						<div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 								<ul className="nav navbar-nav navbar-right">
-									<li className="active"><Link to='/add'>Add Recipe</Link></li>
-									<li><a href="#">Link</a></li>
+									<li><Link to='/'>All Recipes</Link></li>
+									<li className=""><Link to='/add'>Add Recipe</Link></li>
 								</ul>
 						</div>
 					</nav>
 				</div>
-				<Recipes recipes={recipes} onDelete={this.deleteRecipe} />
-				<Button
-					bsStyle="default"
-					onClick={() => this.setState({ show: true})}>
-						Add Recipe
-				</Button>
-				<div className="modal-container">
-					<Modal
-						show={this.state.show}
-						onHide={close}
-						container={this}
-						aria-labelledby="contained-modal-title">
+				{/*<Recipes recipes={recipes} onDelete={this.deleteRecipe} />*/}
+				<Link to='/add'><Button bsStyle="default"> {/* onClick={() => this.setState({ show: true})} */}
+					Add Recipe
+				</Button></Link>
 
-						<Modal.Header>
-							<Modal.Title>Add Recipe</Modal.Title>
-						</Modal.Header>
+				{this.props.children}
 
-						<Modal.Body>
-							<form id="recipeForm">
-								<div className="form-group">
-									<Input type="text" 
-										label="Name" 
-										groupClassName="group-class"
-										labelClassName="label-class"
-										id="recipeName"
-										name="recipeName"
-										size="50"
-										help="Name must be unique or recipe will not be saved."
-										bsStyle={this.state.nameValid} hasFeedback
-										onChange={this.validationState}
-									/>
-								</div>
-								<div className="form-group">
-									<label htmlFor="recipe-ingredients">Ingredients</label>
-									<input type="text" className="form-control" id="recipeIngredients" name="recipeIngredients" placeholder="enter ingredients separated by commas" size="50" />
-								</div>
-							</form>
-						</Modal.Body>
-
-						<Modal.Footer>
-							<Button type="submit" onClick={this.addRecipe} bsStyle="primary" >Save</Button>
-							<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>
-						</Modal.Footer>
-					</Modal>
-				</div>
 			</div>
 		);
 	}

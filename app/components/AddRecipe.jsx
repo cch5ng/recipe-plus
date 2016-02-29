@@ -8,6 +8,7 @@ import uuid from 'node-uuid';
 import {Modal} from 'react-bootstrap';
 import {Button} from 'react-bootstrap';
 import {Input} from 'react-bootstrap';
+import {Link} from 'react-router';
 
 export default class AddRecipe extends React.Component {
 	constructor(props) {
@@ -46,7 +47,7 @@ export default class AddRecipe extends React.Component {
 
 						<Modal.Footer>*/}
 							<Button type="submit" onClick={this.addRecipe} bsStyle="primary" >Save</Button>
-							<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>
+							<Link to='/'><Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button></Link>
 						{/*</Modal.Footer>
 					</Modal>*/}
 				</div>
@@ -78,6 +79,9 @@ export default class AddRecipe extends React.Component {
 		if (this.state.nameValid === 'success') {
 			event.preventDefault();
 
+			//recipeObj = {ingredients: [str1, str2, ...], steps: [str1, str2, ...]}
+			let mrecipeObj = {}
+
 	//parsing the ingredients, cleaning up the format so it will display cleanly later on
 			let name = document.getElementById('recipeName').value;
 			console.log('name: ' + name);
@@ -91,20 +95,30 @@ export default class AddRecipe extends React.Component {
 			});
 			//making the ingredients list in localStorage comma delimited but no space
 			var ingredientsStrClean = ingredientsTrim.join(',');
+			mrecipeObj.ingredients = ingredientsStrClean;
+
+	//checking the steps, what signifies the para breaks
+			let steps = document.getElementById('recipeSteps').value;
+			console.log('steps: ' + steps);
+
+			mrecipeObj.steps = steps;
 
 	//updating localStorage
-			localStorage.setItem(name, ingredientsStrClean);
+			//localStorage.setItem(name, ingredientsStrClean);
+			localStorage.setItem(name, JSON.stringify(mrecipeObj));
 
 			let form = document.getElementById('recipeForm');
 			form.reset();
 
-			let curRecipes = this.state.recipes;
-			let recipeObj = {};
-			recipeObj.id = uuid.v4();
-			recipeObj.name = name;
-			curRecipes.push(recipeObj);
-			this.setState({recipes: curRecipes});
-			//console.log('typeof recipes from addRecipes: ' + typeof this.state.recipes);
+//TODO update application state w/ new model def
+
+			// let curRecipes = this.state.recipes;
+			// let recipeObj = {};
+			// recipeObj.id = uuid.v4();
+			// recipeObj.name = name;
+			// curRecipes.push(recipeObj);
+			// this.setState({recipes: curRecipes});
+			// //console.log('typeof recipes from addRecipes: ' + typeof this.state.recipes);
 			//console.log('recipes length: ' + this.state.recipes.length);
 		}
 	};
