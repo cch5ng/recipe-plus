@@ -13,17 +13,17 @@ import {Link} from 'react-router';
 export default class App extends React.Component {
 	constructor(props) {
 		super(props);
-		let namesAr = [];
-		var recipes = [];
-		namesAr = this.getNames().split(',');
-		namesAr.forEach(name => {
-			let mrecipe = {};
-			mrecipe.name = name;
-			mrecipe.id = uuid.v4();
-			recipes.push(mrecipe);
-		});
+		// let namesAr = [];
+		// var recipes = [];
+		// namesAr = this.getNames().split(',');
+		// namesAr.forEach(name => {
+		// 	let mrecipe = {};
+		// 	mrecipe.name = name;
+		// 	mrecipe.id = uuid.v4();
+		// 	recipes.push(mrecipe);
+		// });
 		this.state = {
-			recipes: recipes,
+			// recipes: recipes,
 			show: false,
 			nameValid: 'success'
 		}
