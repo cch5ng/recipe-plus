@@ -1,6 +1,7 @@
 //app/components/Recipe.jsx
 
 import React from 'react';
+import Nav from './Nav.jsx';
 import {Modal} from 'react-bootstrap';
 import {Button} from 'react-bootstrap';
 import {Input} from 'react-bootstrap';
@@ -9,6 +10,8 @@ export default class Recipe extends React.Component {
 
 	constructor(props) {
 		super(props);
+		console.log('prop name: ' + this.props.name);
+		console.log('prop key: ' + this.props.key);
 
 		this.state = {
 			isOpen: false,
@@ -26,69 +29,84 @@ export default class Recipe extends React.Component {
 
 		//using the recipe name as a unique identifier to set className and accordion display state
 		let classStr, classStrOutter;
-		(this.state.isOpen) ? classStr = this.concatName() + ' padding' : classStr = this.concatName() + ' padding hidden';
-		(name) ? classStrOutter = 'recipe clear' : classStrOutter = 'recipe clear hidden';
+		classStr = this.concatName() + ' padding';
+		//(this.state.isOpen) ? classStr = this.concatName() + ' padding' : classStr = this.concatName() + ' padding hidden';
+		classStrOutter = 'recipe clear';
+		//(name) ? classStrOutter = 'recipe clear' : classStrOutter = 'recipe clear hidden';
 		let ingredientsAr = [];
 		let ingredientsStr;
 		let nameStr = this.props.name;
 		//console.log('this.props.data: ' + this.props.data);
-		ingredientsStr = localStorage.getItem(name);
+		let recipeObj = JSON.parse(localStorage.getItem(name));
+		console.log('typeof recipeObj: ' + typeof recipeObj);
+		console.log('recipeObj: ' + recipeObj);
 		//console.log('ingredientsStr: ' + ingredientsStr);
-		if (ingredientsStr) {
+		//if (recipeObj) {
 //on data input to localStorage, spaces are trimmed so list should be strictly comma-delimited
-			ingredientsAr = ingredientsStr.split(',');
-		}
+		//	ingredientsAr = recipeObj.ingredients;
+		//}
 		// console.log('length ingredientsAr: ' + ingredientsAr.length);
-		var ingredientNodes = ingredientsAr.map(function(ingred, i) {
-			let keyStr = trimSpaces(nameStr) + ingred;
-			return (
-				<div className="ingredient" key={i} >
-					{ingred}
-				</div>
-			);
-		});
+
+		console.log('recipeObj.ingredients: ' + recipeObj.ingredients);
+		console.log('typeof recipeObj.ingredients: ' + typeof recipeObj.ingredients);
+		console.log('length recipeObj.ingredients: ' + recipeObj.ingredients.length);
+		console.log('first ingred: ' + recipeObj.ingredients[0]);
+		if (recipeObj.ingredients) {
+			var ingredientNodes = (recipeObj.ingredients).map(function(ingred, i) {
+				//let keyStr = trimSpaces(nameStr) + ingred;
+				return (
+					<div className="ingredient" key={i} >
+						{ingred}
+					</div>
+				);
+			});
+		}
 
 		return (
-			<div className={classStrOutter} key={key}>
-				<p className="h4" onClick={this.toggleIngredients}>{name}</p>
-				<div className={classStr}>
-					<p className="h5">INGREDIENTS</p>
-					<div className="ingredientList">
-						{ingredientNodes}
-					</div>
-					<div className="button-section">
-						{onDelete ? this.renderDelete() : null}
-						<Button bsStyle="default" onClick={() => this.setState({ show: true})}>Edit</Button>
-						<div className="modal-container">
-							<Modal
-								show={this.state.show}
-								onHide={close}
-								container={this}
-								aria-labelledby="contained-modal-title">
+			<div className="container-fluid">
+				<Nav />
 
-								<Modal.Header>
-									<Modal.Title>Edit Recipe</Modal.Title>
-								</Modal.Header>
-
-								<Modal.Body>
-									<form id="recipeEditForm">
-										<div className="form-group">
-											<label htmlFor="recipeName">Name</label>
-											<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" value={this.props.name} readOnly />
-										</div>
-										<div className="form-group">
-											<label htmlFor="recipeIngredientsEdit">Ingredients</label>
-											<input type="text" className="form-control" id="recipeIngredientsEdit" name="recipeIngredientsEdit" value={this.state.ingredients} onChange={this.updateIngredientsField} size="50" />
-										</div>
-									</form>
-								</Modal.Body>
-
-								<Modal.Footer>
-									<Button type="submit" onClick={this.editRecipe} bsStyle="primary">Save</Button>
-									<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>
-								</Modal.Footer>
-							</Modal>
+				<div className={classStrOutter} key={key}>
+					<p className="h4" onClick={this.toggleIngredients}>{name}</p>
+					<div className={classStr}>
+						<p className="h5">INGREDIENTS</p>
+						<div className="ingredientList">
+							{ingredientNodes}
 						</div>
+						{/*<div className="button-section">
+							{onDelete ? this.renderDelete() : null}
+							<Button bsStyle="default" onClick={() => this.setState({ show: true})}>Edit</Button>
+							<div className="modal-container">
+								<Modal
+									show={this.state.show}
+									onHide={close}
+									container={this}
+									aria-labelledby="contained-modal-title">
+
+									<Modal.Header>
+										<Modal.Title>Edit Recipe</Modal.Title>
+									</Modal.Header>
+
+									<Modal.Body>
+										<form id="recipeEditForm">
+											<div className="form-group">
+												<label htmlFor="recipeName">Name</label>
+												<input type="text" className="form-control" id="recipeName" name="recipeName" size="50" value={this.props.name} readOnly />
+											</div>
+											<div className="form-group">
+												<label htmlFor="recipeIngredientsEdit">Ingredients</label>
+												<input type="text" className="form-control" id="recipeIngredientsEdit" name="recipeIngredientsEdit" value={this.state.ingredients} onChange={this.updateIngredientsField} size="50" />
+											</div>
+										</form>
+									</Modal.Body>
+
+									<Modal.Footer>
+										<Button type="submit" onClick={this.editRecipe} bsStyle="primary">Save</Button>
+										<Button bsStyle="default" onClick={() => this.setState({show: false})}>Close</Button>
+									</Modal.Footer>
+								</Modal>
+							</div>
+						</div>*/}
 					</div>
 				</div>
 			</div>
