@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import '../startup.js';
 import Recipes from './Recipes.jsx';
+import Nav from './Nav.jsx';
 import uuid from 'node-uuid';
 import {Modal} from 'react-bootstrap';
 import {Button} from 'react-bootstrap';
@@ -22,6 +23,7 @@ export default class AddRecipe extends React.Component {
 	render () {
 		return (
 				<div className="container-fluid">
+					<Nav />
 					{/*<Modal
 						show={this.state.show}
 						onHide={close}
