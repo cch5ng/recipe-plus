@@ -94,14 +94,16 @@ export default class AddRecipe extends React.Component {
 				ingredientsTrim.push(itemCopy);
 			});
 			//making the ingredients list in localStorage comma delimited but no space
-			var ingredientsStrClean = ingredientsTrim.join(',');
-			mrecipeObj.ingredients = ingredientsStrClean;
+			//var ingredientsStrClean = ingredientsTrim.join(',');
+			mrecipeObj.ingredients = ingredientsTrim;
 
 	//checking the steps, what signifies the para breaks
 			let steps = document.getElementById('recipeSteps').value;
+			let stepsAr = steps.split('\n');
 			console.log('steps: ' + steps);
+			console.log('stepsAr: ' + stepsAr);
 
-			mrecipeObj.steps = steps;
+			mrecipeObj.steps = stepsAr;
 
 	//updating localStorage
 			//localStorage.setItem(name, ingredientsStrClean);
