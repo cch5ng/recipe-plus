@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import '../startup.js';
 import Recipes from './Recipes.jsx';
+import Nav from './Nav.jsx';
 import uuid from 'node-uuid';
 import {Modal} from 'react-bootstrap';
 import {Button} from 'react-bootstrap';
@@ -13,17 +14,17 @@ import {Link} from 'react-router';
 export default class App extends React.Component {
 	constructor(props) {
 		super(props);
-		// let namesAr = [];
-		// var recipes = [];
-		// namesAr = this.getNames().split(',');
-		// namesAr.forEach(name => {
-		// 	let mrecipe = {};
-		// 	mrecipe.name = name;
-		// 	mrecipe.id = uuid.v4();
-		// 	recipes.push(mrecipe);
-		// });
+		let namesAr = [];
+		var recipes = [];
+		namesAr = this.getNames().split(',');
+		namesAr.forEach(name => {
+			let mrecipe = {};
+			mrecipe.name = name;
+			mrecipe.id = uuid.v4();
+			recipes.push(mrecipe);
+		});
 		this.state = {
-			// recipes: recipes,
+			recipes: recipes,
 			show: false,
 			nameValid: 'success'
 		}
@@ -33,20 +34,8 @@ export default class App extends React.Component {
 		let recipes = this.state.recipes;
 		return (
 			<div className="container-fluid" >
-				<div className="row">
-					<nav className="navbar navbar-default">
-						<div className="navbar-header">
-							<a className="navbar-brand" href="#">Recipe Plus</a>
-						</div>
-						<div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-								<ul className="nav navbar-nav navbar-right">
-									<li><Link to='/'>All Recipes</Link></li>
-									<li className=""><Link to='/add'>Add Recipe</Link></li>
-								</ul>
-						</div>
-					</nav>
-				</div>
-				{/*<Recipes recipes={recipes} onDelete={this.deleteRecipe} />*/}
+				<Nav />
+				<Recipes recipes={recipes} onDelete={this.deleteRecipe} />
 				<Link to='/add'><Button bsStyle="default"> {/* onClick={() => this.setState({ show: true})} */}
 					Add Recipe
 				</Button></Link>
@@ -152,7 +141,7 @@ export default class App extends React.Component {
 				namesStr += localStorage.key(i);
 			}
 		}
-		//console.log('namesStr: ' + namesStr);
+		console.log('namesStr: ' + namesStr);
 		//console.log('storage count: ' + namesCount);
 		return namesStr;
 	};
